@@ -1,3 +1,5 @@
+# Intuiton first, code next (python, Java and c++) and time complexity analysis at the last. 
+
 """
 Problem: "Find the minimum no of rooms required to schdule all meeting without any conflict".
 
@@ -11,160 +13,332 @@ Brute Force: O(n^2)
 just sort and check the current meeting start time with the end of all the meetings before.
 if none of previous meeting has ended, incr the count by '1' because we will have to arrange the current meeting in different conference room.'
 at last return the count
+"""
 
-method 2: O(n*logn)
-Logic: Jo room khali hoga koi interval ke bad uske hmko use karna h and apna sb interval ko run karbana h.
-Hmko bs sb meeting start kar dena h.
-Iske liye koi meeting end ho rha h ki nhi , cur meeting ke start se phle wo hmko track karna hoga
-for minimum ans we need the smallest ending time .
-from here we get intuition that we have to sort according to minimum ending time.
+# Approach 1 - Using a heap (can also term it Greedy)
 
-Now we will try to schedule the meeting having minimum starting time first if any meeting ends
-from here we get intuition of soting base on starting time also.
+"""
+As you might have understood from the problem statement, our main goal is to fit non-overlapping intervals into one day, as return the minimum days possible.
 
-finally we have to sort based on starting and ending time separately.
+So, while iterating through the intervals, we want to know if there is any other interval, which is non-overlapping with it, that can we fit along with it in the same day.
+To know more about overlapping and non-overlapping intervals, solve Meeting Rooms - 1. 
 
-Note: Just focus on that "we have to start all the meetings".
+Heap is a data which the minimum value on its top and we can heappop it out.
+So, if we can send the end times we encounter into the heap, and while iterating through the array, if we find the top is the heap <= satrt time of current interval, that means we can fit these both in a single day.
+Hence, we will push the end times into a heap and heappop it each time the start time is more than it.
 
-How to do?: Take two arrays say start and end that will store the start and end time of meetings respectively.
-now sort these arrays
-vvi: now take two pointer one each to start and end array respectively.
-run the loop till all meetings has started because after all meeting have started then no need to alloacate any different room.
-compare both the pointer value and if overlapping i.e start value is less than incr the count by '1' and incr the start pointer.
-else decr the count by '1' and incr the end pointer.
-after every comparison update the ans
+The, final length of the heap will be our answer.
+This is because, the ones left in the heap are the ones which cant be merged anymore, and that is the minimum number of days required.
+"""
 
-here count will tell the 'no of conferernce room at present' after each meeting.
+# CODE: 
 
-why we came through this? if start is less than end value then it means the ongoing meeting has not ended and we have to start the new meeting
-so incr the count by '1'.
-else: one of the meeting has ended so decr the count by '1'.
+# PYTHON :
 
-Note: Another way of asking this Q :"Find the maximum no of overlapping intervals at once"
+
+class Solution:
+    def minMeetingRooms(self, intervals: List[Interval]) -> int:
+        intervals.sort(key=lambda x: x.start)
+        min_heap = []
+
+        for interval in intervals:
+            if min_heap and min_heap[0] <= interval.start:
+                heapq.heappop(min_heap)
+            heapq.heappush(min_heap, interval.end)
+
+        return len(min_heap)
+
+
+
+# JAVA:
+
+
+
+"""
+class Solution {
+    public int minMeetingRooms(int[][] intervals) {
+        Arrays.sort(intervals, (a, b) -> Integer.compare(a[0], b[0]));
+        PriorityQueue<Integer> minHeap = new PriorityQueue<>();
+
+        for (int[] interval : intervals) {
+            if (!minHeap.isEmpty() && minHeap.peek() <= interval[0]) {
+                minHeap.poll();
+            }
+            minHeap.offer(interval[1]);
+        }
+
+        return minHeap.size();
+    }
+}
+"""
+
+
+
+# C++ :
+
+
+
+"""
+class Solution {
+public:
+    int minMeetingRooms(vector<vector<int>>& intervals) {
+        sort(intervals.begin(), intervals.end());
+        priority_queue<int, vector<int>, greater<int>> minHeap;
+
+        for (auto& interval : intervals) {
+            if (!minHeap.empty() && minHeap.top() <= interval[0]) {
+                minHeap.pop();
+            }
+            minHeap.push(interval[1]);
+        }
+
+        return minHeap.size();
+    }
+};
+"""
+
+
+# TIME COMPLEXITY :
+
+# -> heap opertaing takes 0(n log n ) time .
+# -> itertaing throught the array is 0(n)
+# -> overall time complexity is 0(nlogn)
+
+
+# SPACE COMPLEXITY:
+
+# -> 0(n) for the heap.
+
+
+
+
+# METHOD 2 : Using Sweep Line Algorithm 
+
+
+# Intuition : 
+
+
+"""
+If you do not have prior knowledge about the Sweep Line Algorithm, learn it and come back again - Prefix Sums is a pre-requisite.
+
+For those have an idea about sweep Line - Here's a quick revision :
+-> It is mostly used for interval related problems
+-> To count or to populate the number of elements present at a certain time in 0(1) time, we used this algorithm.
+-> We define an empty array set to 0 of n size.
+-> We add 1 to the initial points of all the starting points of the intervals and -1 to the end points.
+-> This way, while iterating through the created array, we can keep a count of the sum acquired at each point, giving us the population of it at that time in 0(1).
+
+
+How is sweep line used in this question ? 
+
+After making ready the prefix array, while iterating through it, we keep a count of the maximum sum encountered.
+This, in turn will be the no. of days required.
+
+You can do a dry run of this for better understanding.
+"""
+
+
+# CODE : 
+
+
+# PYTHON : 
+
+
+class Solution:
+    def minMeetingRooms(self, intervals: List[Interval]) -> int:
+        mp = defaultdict(int)
+        for i in intervals:
+            mp[i.start] += 1
+            mp[i.end] -= 1
+        prev = 0
+        res = 0
+        for i in sorted(mp.keys()):
+            prev += mp[i]
+            res = max(res, prev)
+        return res
+    
+
+# JAVA : 
+
+
+"""
+class Solution {
+    public int minMeetingRooms(int[][] intervals) {
+        TreeMap<Integer, Integer> map = new TreeMap<>();
+        for (int[] interval : intervals) {
+            map.put(interval[0], map.getOrDefault(interval[0], 0) + 1);
+            map.put(interval[1], map.getOrDefault(interval[1], 0) - 1);
+        }
+
+        int prev = 0, res = 0;
+        for (int count : map.values()) {
+            prev += count;
+            res = Math.max(res, prev);
+        }
+
+        return res;
+    }
+}
+"""
+
+
+
+
+# C++ : 
+
+
+
+"""
+class Solution {
+public:
+    int minMeetingRooms(vector<vector<int>>& intervals) {
+        map<int, int> mp;
+        for (auto& interval : intervals) {
+            mp[interval[0]]++;
+            mp[interval[1]]--;
+        }
+
+        int prev = 0, res = 0;
+        for (auto& [time, count] : mp) {
+            prev += count;
+            res = max(res, prev);
+        }
+
+        return res;
+    }
+};
+"""
+
+
+
+# TIME COMPLEXITY ANALYSIS :
+
+# -> We run through the array and the prefix array once each, making it 0(n)
+
+# SPACE COMPLEXITY :
+
+# -> 0(N) for storing the prefix array 
+
+
+
+
+
+
+# Method 3 : 2 Pointer Approach - Just for reference..
+
+
+# CODE : 
+
+
+# PYTHON : 
+
+
+"""
+Definition of Interval:
+class Interval(object):
+    def __init__(self, start, end):
+        self.start = start
+        self.end = end
 """
 
 class Solution:
-    def min_meeting_rooms(self, intervals: List[Interval]) -> int:
-        start= sorted([i.start for i in intervals])
-        end=   sorted([i.end   for i in intervals])
-        ans, count= 0, 0
-        s, e= 0, 0  # pointer to start and end array
-        while s < len(start):  # till we have started all the meetings
-            # overlapping so we will need one new room.
+    def minMeetingRooms(self, intervals: List[Interval]) -> int:
+        start = sorted([i.start for i in intervals])
+        end = sorted([i.end for i in intervals])
+        
+        res = count = 0
+        s = e = 0
+        while s < len(intervals):
             if start[s] < end[e]:
-                count+= 1  # allocated new room for overlapping meeting 
-                s+= 1   # started one so incr 's' by '1'.
-                ans= max(ans, count)
+                s += 1
+                count += 1
             else:
-                # one meeting ended. now the previous can be used for different meeting so decr total no of room required.
-                count-= 1   
-                e+= 1  # 
-        return ans
+                e += 1
+                count -= 1
+            res = max(res, count)
+        return res
+    
 
 
-# java
-""""
-import java.util.Arrays;
 
+# JAVA : 
+
+
+"""
 class Solution {
     public int minMeetingRooms(int[][] intervals) {
-        if (intervals == null || intervals.length == 0) {
-            return 0;
-        }
+        int n = intervals.length;
+        int[] start = new int[n];
+        int[] end = new int[n];
 
-        // Separate start and end times into two arrays
-        int[] start = new int[intervals.length];
-        int[] end = new int[intervals.length];
-        
-        for (int i = 0; i < intervals.length; i++) {
+        for (int i = 0; i < n; i++) {
             start[i] = intervals[i][0];
             end[i] = intervals[i][1];
         }
 
-        // Sort both arrays
         Arrays.sort(start);
         Arrays.sort(end);
 
-        // Initialize pointers and counters
-        int s = 0, e = 0;
-        int count = 0, ans = 0;
-
-        // Iterate over all the meetings
-        while (s < intervals.length) {
+        int s = 0, e = 0, count = 0, res = 0;
+        while (s < n) {
             if (start[s] < end[e]) {
-                // A new room is needed
                 count++;
                 s++;
-                ans = Math.max(ans, count);
             } else {
-                // A meeting has ended, so a room gets freed up
                 count--;
                 e++;
             }
+            res = Math.max(res, count);
         }
 
-        return ans;
+        return res;
     }
 }
 """
 
-# Method 2: 
-# using sweep line algorithm
-# Logic: 
-"""
-Same as '2848. Points That Intersect With Cars' just we have to keep track of maximum count of rooms and return it.
-When a meeting start we plot +1 for end we do -1.
-Now we scan the line, and store the value in count , 
-if count is 1 that mean 1 meeting start, if its 2 that means 2nd meeting started before 1st ended, so we need 2 room atleast. 
-This count we save in ans if count > ans 
-"""
 
-# Time Complexity = O(n log n )
-class Solution:
-    def minMeetingRooms(self, intervals):
-        line = {}
-        for interval in intervals:
-            line[interval.start] = line.get(interval.start, 0) + 1
-            line[interval.end] = line.get(interval.end, 0) - 1
-            
-        ans = 0
-        count = 0
-        for time in sorted(line.keys()):
-            count += line[time]
-            ans = max(ans, count)
-            
-        return ans
-    
-# java
-"""
-import java.util.TreeMap;
 
+# C++ : 
+
+
+
+"""
 class Solution {
-    public int minMeetingRooms(int[][] intervals) {
-        // Use a TreeMap to simulate the line sweep method
-        TreeMap<Integer, Integer> map = new TreeMap<>();
+public:
+    int minMeetingRooms(vector<vector<int>>& intervals) {
+        int n = intervals.size();
+        vector<int> start(n), end(n);
 
-        // Populate the map with start and end times
-        for (int[] interval : intervals) {
-            // Increment the count for start time
-            map.put(interval[0], map.getOrDefault(interval[0], 0) + 1);
-            // Decrement the count for end time
-            map.put(interval[1], map.getOrDefault(interval[1], 0) - 1);
+        for (int i = 0; i < n; i++) {
+            start[i] = intervals[i][0];
+            end[i] = intervals[i][1];
         }
 
-        int ans = 0;
-        int count = 0;
+        sort(start.begin(), start.end());
+        sort(end.begin(), end.end());
 
-        // Iterate over the sorted keys (times)
-        for (int time : map.keySet()) {
-            count += map.get(time);  // Update the room count
-            ans = Math.max(ans, count);  // Update the maximum rooms needed
+        int s = 0, e = 0, count = 0, res = 0;
+        while (s < n) {
+            if (start[s] < end[e]) {
+                count++;
+                s++;
+            } else {
+                count--;
+                e++;
+            }
+            res = max(res, count);
         }
 
-        return ans;
+        return res;
     }
-}
+};
 """
 
-# Related Q:
-# 1) Minimum Platforms
+
+
+
+
+# Time complexity: 0(N LOG N)
+
+
+# Space complexity: 0(N LOG N)
