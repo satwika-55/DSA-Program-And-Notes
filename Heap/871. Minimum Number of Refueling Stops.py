@@ -116,6 +116,9 @@ class Solution:
                 # Store as negative for Max-Heap behavior in Python
                 heapq.heappush(max_fuel_heap, -stations[station_idx][1])
                 station_idx += 1
+            # no need of this check here
+            # if current_reach >= target:
+            #     return ans
             
             # 2. If we haven't reached the target and have no fuel options left
             if not max_fuel_heap:
