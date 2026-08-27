@@ -1,3 +1,5 @@
+# Method 1: 
+
 # Logic: We have to minimise the idle time for overall minimum time.
 # And for this we need to utilise the cooldown time between two task.
 # And for reducing cooldown time between tasks process the most frequent one first as 
@@ -23,6 +25,7 @@
 # time: O(26*logn + m*n). m= #tasks. in case tasks= a,a,a,a,... we may have to wait till m*n
 
 import collections
+from collections import Counter
 import heapq
 class Solution:
     def leastInterval(self, tasks: List[str], n: int) -> int:
@@ -47,8 +50,101 @@ class Solution:
                 heapq.heappush(maxHeap, q.popleft()[0])
         return time
     
+# Java Code 
+"""
+import java.util.*;
 
-# Method 2: Better one
+public class Solution {
+    public int leastInterval(char[] tasks, int n) {
+        Map<Character, Integer> freq = new HashMap<>();
+        for (char task : tasks) {
+            freq.put(task, freq.getOrDefault(task, 0) + 1);
+        }
+
+        // make a maxHeap with the freq of each char, only we have to take freq of each letter
+        PriorityQueue<Integer> maxHeap = new PriorityQueue<>(Collections.reverseOrder());
+        for (int count : freq.values()) {
+            maxHeap.add(count * -1);    // have to make max heap. Only here freq will matter.
+                                         // For checking same type of task, we are using queue to keep track of time.
+        }
+
+        Queue<int[]> q = new LinkedList<>();
+        int time = 0;
+
+        // if maxHeap is empty and Q is not empty it means there is no ele whose next_process time is matching with curr_time 
+        // then it will be counted as idle
+        while (!maxHeap.isEmpty() || !q.isEmpty()) {
+            time++;
+            if (!maxHeap.isEmpty()) {
+                // Process the most freq task available at this time 
+                int cnt = -1 * maxHeap.poll() - 1;  // basically decr the freq of current task
+                if (cnt != 0) {  // means same task has more time to process so add in 'Q' with [count,next_process_time]
+                    q.add(new int[]{cnt, time + n});   // this task can be processed next time at 'time+n'
+                }
+            }
+
+            // each time check if there is any task that can be processed at curr time
+            if (!q.isEmpty() && q.peek()[1] == time) {
+                maxHeap.add(-1 * q.poll()[0]);  // then push into the maxHeap, only the count of task
+            }
+        }
+
+        return time;
+    }
+}
+"""
+# C++ Code 
+"""
+#include <vector>
+#include <unordered_map>
+#include <queue>
+
+class Solution {
+public:
+    int leastInterval(std::vector<char>& tasks, int n) {
+        std::unordered_map<char, int> freq;
+        for (char task : tasks) {
+            freq[task]++;
+        }
+
+        // make a maxHeap with the freq of each char, only we have to take freq of each letter
+        std::priority_queue<int> maxHeap;
+        for (auto& [_, count] : freq) {
+            maxHeap.push(count);    // have to make max heap. Only here freq will matter.
+                                     // For checking same type of task, we are using queue to keep track of time.
+        }
+
+        std::queue<std::pair<int, int>> q;
+        int time = 0;
+
+        // if maxHeap is empty and Q is not empty it means there is no ele whose next_process time is matching with curr_time 
+        // then it will be counted as idle
+        while (!maxHeap.empty() || !q.empty()) {
+            time++;
+            if (!maxHeap.empty()) {
+                // Process the most freq task available at this time 
+                int cnt = maxHeap.top() - 1;
+                maxHeap.pop();
+                if (cnt > 0) {
+                    // means same task has more time to process so add in 'Q' with [count,next_process_time]
+                    q.push({cnt, time + n});  // this task can be processed next time at 'time+n'
+                }
+            }
+
+            // each time check if there is any task that can be processed at curr time
+            if (!q.empty() && q.front().second == time) {
+                maxHeap.push(q.front().first);  // then push into the maxHeap, only the count of task 
+                q.pop();
+            }
+        }
+
+        return time;
+    }
+};
+"""
+
+# Method 2: 
+# Better one
 # using logic of Q: "358. Rearrange String k Distance Apart".
 # 1) We need to arrange the characters in string such that each same character is K distance apart,
 #  where distance in this problems is time b/w two similar task execution.
@@ -105,66 +201,123 @@ class Solution:
         
         return cnt
 
-
-# Java
-# Method 2:
+# Java Code 
 """
-class Solution {
+import java.util.*;
+
+public class Solution {
     public int leastInterval(char[] tasks, int n) {
-        if (tasks == null || tasks.length == 0)
+        if (tasks.length == 0) {
             return -1;
-        //build map to sum the amount of each task
-        HashMap<Character,Integer> map = new HashMap<>();
-        for (char ch:tasks){
-            map.put(ch,map.getOrDefault(ch,0)+1);
         }
-        
-        // build queue, sort in descending order a/c frequency
-        PriorityQueue<Map.Entry<Character,Integer>> queue = new PriorityQueue<>((a,b)->(b.getValue()-a.getValue()));
-        queue.addAll(map.entrySet());  // adding all letters with frequency but only frequency is also fine.
+
+        // Step 1: Build a frequency map for tasks
+        Map<Character, Integer> freq = new HashMap<>();
+        for (char task : tasks) {
+            freq.put(task, freq.getOrDefault(task, 0) + 1);
+        }
+
+        // Step 2: Use max heap to schedule tasks by their frequencies
+        PriorityQueue<int[]> maxHeap = new PriorityQueue<>((a, b) -> b[0] - a[0]);
+        for (Map.Entry<Character, Integer> entry : freq.entrySet()) {
+            maxHeap.add(new int[]{entry.getValue(), entry.getKey()});
+        }
 
         int cnt = 0;
-        // when queue is not empty, there are remaining tasks
-        while (!queue.isEmpty()){
-            // for each interval
-            int interval = n+1;
-            // list used to update queue
-            List<Map.Entry<Character, Integer>> list = new ArrayList<>();
-    
-            // fill the intervals with the next high freq task
-            while (interval > 0 && !queue.isEmpty()){
-                Map.Entry<Character,Integer> entry = queue.poll();
-                entry.setValue(entry.getValue()-1);
-                list.add(entry);
-                // interval shrinks
-                interval --;
-                // one slot is taken
-                cnt ++;
+        while (!maxHeap.isEmpty()) {
+            int interval = n + 1;  // Interval for cooldown
+            List<int[]> temp = new ArrayList<>();  // Temporary list to store tasks to be updated
+
+            // Process tasks within the interval
+            while (interval > 0 && !maxHeap.isEmpty()) {
+                int[] current = maxHeap.poll();
+                int freqCount = current[0];
+                char task = (char) current[1];
+                freqCount -= 1;  // Decrease frequency since task is executed
+                temp.add(new int[]{freqCount, task});
+                interval--;
+                cnt++;
             }
-            
-            // update the value in the map
-            for (Map.Entry<Character,Integer> entry:list){
-                // when there is left task
-                if (entry.getValue() > 0)
-                    queue.offer(entry);
+
+            // Update tasks back to heap if they have remaining counts
+            for (int[] task : temp) {
+                if (task[0] > 0) {
+                    maxHeap.add(task);
+                }
             }
-            // job done
-            if (queue.isEmpty())
+
+            // If heap is empty, all tasks are processed
+            if (maxHeap.isEmpty()) {
                 break;
-            // if interval is > 0, then the machine can only be idle
+            }
+
+            // If interval > 0, CPU is idle
             cnt += interval;
         }
+
         return cnt;
-}
+    }
 }
 """
+# C++ Code 
+"""
+#include <vector>
+#include <queue>
+#include <unordered_map>
 
+class Solution {
+public:
+    int leastInterval(std::vector<char>& tasks, int n) {
+        if (tasks.empty()) {
+            return -1;
+        }
 
-# Later do using formula:
-# https://leetcode.com/problems/task-scheduler/solutions/3280549/full-explanation-using-priority-queue-and-formula-based-approach/
-# https://leetcode.com/problems/task-scheduler/solutions/760131/java-concise-solution-intuition-explained-in-detail/
+        // Step 1: Build a frequency map for tasks
+        std::unordered_map<char, int> freq;
+        for (char task : tasks) {
+            freq[task]++;
+        }
 
+        // Step 2: Use max heap to schedule tasks by their frequencies
+        using Task = std::pair<int, char>; // (frequency, task)
+        auto cmp = [](Task a, Task b) { return a.first < b.first; };
+        std::priority_queue<Task, std::vector<Task>, decltype(cmp)> maxHeap(cmp);
 
+        for (auto& [ch, count] : freq) {
+            maxHeap.push({count, ch});
+        }
 
-# Related Q:
-# 1) 358. Rearrange String k Distance Apart    => Try later
+        int cnt = 0;
+        while (!maxHeap.empty()) {
+            int interval = n + 1;  // Interval for cooldown
+            std::vector<Task> temp;  // Temporary list to store tasks to be updated
+
+            // Process tasks within the interval
+            while (interval > 0 && !maxHeap.empty()) {
+                auto [freqCount, task] = maxHeap.top(); maxHeap.pop();
+                freqCount -= 1;  // Decrease frequency since task is executed
+                temp.push_back({freqCount, task});
+                interval--;
+                cnt++;
+            }
+
+            // Update tasks back to heap if they have remaining counts
+            for (auto& [count, task] : temp) {
+                if (count > 0) {
+                    maxHeap.push({count, task});
+                }
+            }
+
+            // If heap is empty, all tasks are processed
+            if (maxHeap.empty()) {
+                break;
+            }
+
+            // If interval > 0, CPU is idle
+            cnt += interval;
+        }
+
+        return cnt;
+    }
+};
+"""

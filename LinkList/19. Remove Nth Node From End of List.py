@@ -1,13 +1,20 @@
 
-# 1st method: traversing the linked list two times.
+# 1st method: 
+# traversing the linked list two times.
 # one for finding the length and 2nd for deleting the element
+
+"""
+Analysis:
+Time Complexity: O(m+n) where m is the length of the linked list and n is the position from the end.
+Space Complexity: O(1) as we are not using any extra space.
+"""
+
 class Solution:
     def removeNthFromEnd(self, head: Optional[ListNode], n: int):      
         #create a dummy node at start and make it(dummy.next=head)           
-        #point to the head to handle #the corner cases(like list             
-        # containing only one element ii: when we are deleting the          
-        #first element itself)
-        # and at last retrun dummy.next
+        #point to the head to handle the corner cases like i): list             
+        # containing only one element ii): when we are deleting the          
+        #first element itself) and at last retrun dummy.next
         dummy = ListNode(0)
         dummy.next= head
         # now find the length of link list
@@ -30,8 +37,16 @@ class Solution:
         # now change the pointer to delete the element
         first.next= first.next.next 
         return dummy.next 
+    
 
-# 2nd method(best one): in one travesal
+# 2nd method
+# Best one : in one travesal
+"""
+Analysis:
+Time Complexity: O(m+n) where m is the length of the linked list and n is the position from the end.
+Space Complexity: O(1) as we are not using any extra space.
+"""
+
 class Solution:
     def removeNthFromEnd(self, head: Optional[ListNode], n: int) -> Optional[ListNode]:
         #create a dummy node at start and make it(dummy.next=head) to handle the corner cases like:
@@ -54,8 +69,8 @@ class Solution:
         return dummy.next  
 
 
-# Method 3: just same logic as method 2
-# in one pass.
+# Method 3: 
+# just same logic as method 2 but in one pass.
 class Solution:
     def removeNthFromEnd(self, head: Optional[ListNode], n: int) -> Optional[ListNode]:
         dummy= ListNode()
@@ -76,77 +91,80 @@ class Solution:
 
 """
 // method 1: 
-class Solution {
+public class Solution {
     public ListNode removeNthFromEnd(ListNode head, int n) {
-        // Create a dummy node at the start and point it to the head
-        // This helps handle corner cases, like when the list contains only one element
+        // create a dummy node at start and make it (dummy.next = head)
+        // to handle corner cases like:
+        // 1) list containing only one element
+        // 2) when we are deleting the first element itself
         ListNode dummy = new ListNode(0);
         dummy.next = head;
-        
-        // Find the length of the linked list
+
+        // find the length of linked list
         ListNode current = head;
         int length = 0;
         while (current != null) {
             length++;
             current = current.next;
         }
-        
-        // Traverse till (length - n) to find the node before the one to be deleted
-        length -= n;
-        ListNode first = dummy;
+
+        // set current = dummy and traverse till (length - n)
+        current = dummy;
+        length = length - n;
         while (length > 0) {
             length--;
-            first = first.next;
+            current = current.next;
         }
-        
-        // Change the pointer to delete the element
-        first.next = first.next.next;
-        
-        // Return dummy's next, which is the actual head of the modified list
+
+        // now change the pointer to delete the element
+        current.next = current.next.next;
         return dummy.next;
     }
-
 }
 
 // method 2:
-class Solution {
+public class Solution {
     public ListNode removeNthFromEnd(ListNode head, int n) {
-        // Create a dummy node at the start and point it to the head
-        // This helps handle corner cases, like when there is only one element or when the first element is the nth from the last
+        // create a dummy node at start and make it (dummy.next = head)
+        // to handle corner cases like:
+        // 1) when there's only one element
+        // 2) when the 1st element is the nth from the last
         ListNode dummy = new ListNode(0);
         dummy.next = head;
-        
+
         ListNode first = dummy;
         ListNode second = dummy;
-        
-        // Move the first pointer n steps ahead
-        for (int i = 0; i <= n; i++) {
+
+        // move the first pointer n steps ahead
+        for (int i = 0; i < n; i++) {
             first = first.next;
         }
-        
-        // Move both pointers until the first pointer reaches the end
-        while (first != null) {
+
+        // now move both pointers until first reaches end
+        while (first.next != null) {
             first = first.next;
             second = second.next;
         }
-        
-        // Update the pointers to remove the nth node from the end
+
+        // remove the nth node from end
         second.next = second.next.next;
-        
-        // Return dummy's next, which is the actual head of the modified list
         return dummy.next;
     }
 }
 
+
 // method 3:
-class Solution {
+public class Solution {
     public ListNode removeNthFromEnd(ListNode head, int n) {
-        ListNode dummy = new ListNode();
+        // create a dummy node at start to handle corner cases
+        ListNode dummy = new ListNode(0);
         dummy.next = head;
-        ListNode slow = dummy, fast = dummy;
+
+        ListNode slow = dummy;
+        ListNode fast = dummy;
         int count = 0;
 
-        // Move fast ahead by n nodes
+        // move fast pointer and update count
         while (fast.next != null) {
             fast = fast.next;
             count++;
@@ -155,13 +173,106 @@ class Solution {
             }
         }
 
-        // Remove the nth node from the end
+        // remove the nth node from end
         slow.next = slow.next.next;
-
-        // Return the head of the modified list
         return dummy.next;
     }
 }
 
 """
         
+# C++ Code 
+"""
+//Method 1
+class Solution {
+public:
+    ListNode* removeNthFromEnd(ListNode* head, int n) {
+        // create a dummy node at start and make it (dummy->next = head)
+        // to handle corner cases like:
+        // 1) list containing only one element
+        // 2) when we are deleting the first element itself
+        ListNode* dummy = new ListNode(0);
+        dummy->next = head;
+
+        // find the length of linked list
+        ListNode* current = head;
+        int length = 0;
+        while (current != nullptr) {
+            length++;
+            current = current->next;
+        }
+
+        // set current = dummy and traverse till (length - n)
+        current = dummy;
+        length = length - n;
+        while (length > 0) {
+            length--;
+            current = current->next;
+        }
+
+        // now change the pointer to delete the element
+        current->next = current->next->next;
+        return dummy->next;
+    }
+};
+
+
+//Method 2
+class Solution {
+public:
+    ListNode* removeNthFromEnd(ListNode* head, int n) {
+        // create a dummy node at start and make it (dummy->next = head)
+        // to handle corner cases like:
+        // 1) when there's only one element
+        // 2) when the 1st element is the nth from the last
+        ListNode* dummy = new ListNode(0);
+        dummy->next = head;
+
+        ListNode* first = dummy;
+        ListNode* second = dummy;
+
+        // move the first pointer n steps ahead
+        for (int i = 0; i < n; i++) {
+            first = first->next;
+        }
+
+        // now move both pointers until first reaches end
+        while (first->next != nullptr) {
+            first = first->next;
+            second = second->next;
+        }
+
+        // remove the nth node from end
+        second->next = second->next->next;
+        return dummy->next;
+    }
+};
+
+// Method 3
+class Solution {
+public:
+    ListNode* removeNthFromEnd(ListNode* head, int n) {
+        // create a dummy node at start to handle corner cases
+        ListNode* dummy = new ListNode(0);
+        dummy->next = head;
+
+        ListNode* slow = dummy;
+        ListNode* fast = dummy;
+        int count = 0;
+
+        // move fast pointer and update count
+        while (fast->next != nullptr) {
+            fast = fast->next;
+            count++;
+            if (count > n) {
+                slow = slow->next;
+            }
+        }
+
+        // remove the nth node from end
+        slow->next = slow->next->next;
+        return dummy->next;
+    }
+};
+
+"""

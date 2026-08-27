@@ -7,6 +7,8 @@ That is the number of palindromes with that character in the first and last posi
 
 Example: abcbba, we have two unique chars between first and last a (c and b), 
 and two - between first and last b (b and c). No characters in between c so it forms no palindromes.
+
+time: O(n), space: O(26)
 """
 
 class Solution:
@@ -59,4 +61,36 @@ class Solution {
         return result;
     }
 }
+"""
+
+# C++ Code 
+"""
+#include <string>
+#include <vector>
+#include <unordered_set>
+using namespace std;
+
+class Solution {
+public:
+    int countPalindromicSubsequence(string s) {
+        vector<int> first(26, INT_MAX), last(26, -1);
+        int res = 0;
+
+        // Record the first and last occurrences of each character
+        for (int i = 0; i < s.size(); i++) {
+            int index = s[i] - 'a';
+            first[index] = min(first[index], i);
+            last[index] = i;
+        }
+
+        // Count distinct characters between first and last occurrence of each character
+        for (int i = 0; i < 26; i++) {
+            if (first[i] < last[i]) {
+                unordered_set<char> unique_chars(s.begin() + first[i] + 1, s.begin() + last[i]);
+                res += unique_chars.size();
+            }
+        }
+        return res;
+    }
+};
 """

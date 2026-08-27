@@ -1,3 +1,5 @@
+# Method 1: 
+
 # Q is totally same as "jump game 1 " but changed the explanation to confuse.
 # Here we have to find the minimum no of jumps required to go to last index.
 # method 1: we can do by DP like jump game 1 but will go in O(n^2)
@@ -15,6 +17,9 @@
 # 'l', 'r' tell the range of curr level you are considering now. after considering each level you incr the 'ans' by '1'.
 
 # easier and better one. Totally same as multiospurce bfs logic.
+
+# Time : O(n), space: O(1)
+
 class Solution:
     def jump(self, nums: List[int]) -> int:
         ans, l, r= 0, 0, 0  
@@ -29,6 +34,11 @@ class Solution:
 
 # method 2: good one
 # same way we solved 'Jump Game'.
+# we only need to run loop till 'n-2' because we will must reach 'n-1' in next level since it is given that there is at least one path possible.
+# i.e considering all the level before we will must reach the last index.
+# Time : O(n), space: O(1)
+
+
 class Solution:
     def jump(self, nums: List[int]) -> int:
         jumps= 0   # will tell the min no jumps required. will tell only how many level we traversed to raech the last index.
@@ -41,10 +51,84 @@ class Solution:
                 jumps+= 1
         return jumps
 
-# we only need to run loop till 'n-2' because we will must reach 'n-1' in next level since it is given that there is at least one path possible.
-# i.e considering all the level before we will must reach the last index.
-
 
 # Similar Q:
 # ) 1024. Video Stitching
 # 2) 
+
+# Java Code 
+"""
+class Solution {
+    public int jump(int[] nums) {
+        int ans = 0, l = 0, r = 0;
+        while (r < nums.length - 1) {  // if it breaks when we have reached the last point
+            int farthest = 0;  // will tell how far we can reach using the index we have already reached.
+            for (int i = l; i <= r; i++) {  // taking the all elements in range and calculating how far we can reach with help of them.
+                farthest = Math.max(farthest, i + nums[i]);
+            }
+            ans += 1;
+            l = r + 1;
+            r = farthest;  // 'l' will equal to 'r+1' so avoid calculation till 'l' again since for till 'l' we have already calculated before.
+        }
+        return ans;
+    }
+}
+// Method 2: good one
+// same way we solved 'Jump Game'.
+class Solution {
+    public int jump(int[] nums) {
+        int jumps = 0;  // will tell the min no jumps required. will tell only how many level we traversed to reach the last index.
+        int farthest = 0;  // will tell how farthest index we have reached till now using all the node we have visited till current level
+        int lastJumpedPos = 0;  // will tell the range of the next level. after reaching here only we can incr our 'jump'
+        for (int i = 0; i < nums.length - 1; i++) {  // loop will go till 'n-1' only
+            farthest = Math.max(farthest, i + nums[i]);
+            if (i == lastJumpedPos) {  // means if we have considered all the ele at curr level.
+                lastJumpedPos = farthest;  // increasing the range i.e ele to be considered in next level.
+                jumps += 1;
+            }
+        }
+        return jumps;
+    }
+}
+
+"""
+
+# C++ Code 
+"""
+class Solution {
+public:
+    int jump(vector<int>& nums) {
+        int ans = 0, l = 0, r = 0;
+        while (r < nums.size() - 1) {  // if it breaks when we have reached the last point
+            int farthest = 0;  // will tell how far we can reach using the index we have already reached.
+            for (int i = l; i <= r; i++) {  // taking the all elements in range and calculating how far we can reach with help of them.
+                farthest = max(farthest, i + nums[i]);
+            }
+            ans += 1;
+            l = r + 1;
+            r = farthest;  // 'l' will equal to 'r+1' so avoid calculation till 'l' again since for till 'l' we have already calculated before.
+        }
+        return ans;
+    }
+};
+
+// Method 2: good one
+// same way we solved 'Jump Game'.
+class Solution {
+public:
+    int jump(vector<int>& nums) {
+        int jumps = 0;  // will tell the min no jumps required. will tell only how many level we traversed to reach the last index.
+        int farthest = 0;  // will tell how farthest index we have reached till now using all the node we have visited till current level
+        int lastJumpedPos = 0;  // will tell the range of the next level. after reaching here only we can incr our 'jump'
+        for (int i = 0; i < nums.size() - 1; i++) {  // loop will go till 'n-1' only
+            farthest = max(farthest, i + nums[i]);
+            if (i == lastJumpedPos) {  // means if we have considered all the ele at curr level.
+                lastJumpedPos = farthest;  // increasing the range i.e ele to be considered in next level.
+                jumps += 1;
+            }
+        }
+        return jumps;
+    }
+};
+
+"""

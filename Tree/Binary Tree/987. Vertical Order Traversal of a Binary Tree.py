@@ -1,3 +1,5 @@
+# method 1: 
+
 # Brute force :
 """
 find the minimum horizontal distance and maximum horizontal distance, 
@@ -51,6 +53,116 @@ class Solution:
         self.PrintNode(root.left, level, line , hd-1)
         self.PrintNode(root.right, level, line , hd+1)
 
+# Java Code 
+"""
+import java.util.*;
+
+class TreeNode {
+    int val;
+    TreeNode left, right;
+    TreeNode(int x) { val = x; }
+}
+
+class Solution {
+    int minHD = 0, maxHD = 0;
+
+    public List<List<Integer>> verticalTraversal(TreeNode root) {
+        // find the minimum and maximum horizontal distance in the tree
+        // min will be at leftmost root and maximum will be at rightmost root
+        FindHD(root, 0);  // also a traversal only  preorder
+        System.out.println(minHD + " " + maxHD);
+
+        // now print the node from minHD to maxHD which matches with the given horizontal distance
+        List<List<Integer>> ans = new ArrayList<>();
+        for (int line = minHD; line <= maxHD; line++) {
+            List<Integer> level = new ArrayList<>();
+            PrintNode(root, level, line, 0);  // it just a traversal totally preorder
+            ans.add(level);
+        }
+        return ans;
+    }
+
+    // hd: taking horizontal distance of left child to be -1 and for right child +1
+    void FindHD(TreeNode root, int hd) {
+        if (root == null) {
+            return;
+        }
+        // update minHd and maxHD every time
+        minHD = Math.min(minHD, hd);
+        maxHD = Math.max(maxHD, hd);
+        FindHD(root.left, hd - 1);
+        FindHD(root.right, hd + 1);
+    }
+
+    // if node level hd matches with level just add that into the ans
+    // just a preorder traversal(you can apply any but preorder will be more easier and readable)
+    void PrintNode(TreeNode root, List<Integer> level, int line, int hd) {
+        if (root == null) {
+            return;
+        }
+        if (hd == line) {
+            level.add(root.val);
+        }
+        PrintNode(root.left, level, line, hd - 1);
+        PrintNode(root.right, level, line, hd + 1);
+    }
+}
+"""
+# C++ Code 
+"""
+#include <vector>
+#include <iostream>
+using namespace std;
+
+struct TreeNode {
+    int val;
+    TreeNode* left;
+    TreeNode* right;
+    TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+};
+
+class Solution {
+public:
+    int minHD = 0, maxHD = 0;
+
+    vector<vector<int>> verticalTraversal(TreeNode* root) {
+        // find the minimum and maximum horizontal distance in the tree
+        // min will be at leftmost root and maximum will be at rightmost root
+        FindHD(root, 0);  // also a traversal only  preorder
+        cout << minHD << " " << maxHD << endl;
+
+        // now print the node from minHD to maxHD which matches with the given horizontal distance
+        vector<vector<int>> ans;
+        for (int line = minHD; line <= maxHD; ++line) {
+            vector<int> level;
+            PrintNode(root, level, line, 0);  // it just a traversal totally preorder
+            ans.push_back(level);
+        }
+        return ans;
+    }
+
+    // hd: taking horizontal distance of left child to be -1 and for right child +1
+    void FindHD(TreeNode* root, int hd) {
+        if (!root) return;
+        // update minHd and maxHD every time
+        minHD = min(minHD, hd);
+        maxHD = max(maxHD, hd);
+        FindHD(root->left, hd - 1);
+        FindHD(root->right, hd + 1);
+    }
+
+    // if node level hd matches with level just add that into the ans
+    // just a preorder traversal(you can apply any but preorder will be more easier and readable)
+    void PrintNode(TreeNode* root, vector<int>& level, int line, int hd) {
+        if (!root) return;
+        if (hd == line) {
+            level.push_back(root->val);
+        }
+        PrintNode(root->left, level, line, hd - 1);
+        PrintNode(root->right, level, line, hd + 1);
+    }
+};
+"""
 
 # method 2:
 """
@@ -92,97 +204,94 @@ class Solution:
             level = []  # make level empty after each horizontal level to store the ans for next level
         return ans
 
-# Java
-"""
-class Solution {
-    private int minHD, maxHD;
-    private Map<Integer, List<int[]>> map = new HashMap<>();
-    
-    public List<List<Integer>> verticalTraversal(TreeNode root) {
-        minHD = 0;
-        maxHD = 0;
-        dfs(root, 0, 0);
-        
-        List<List<Integer>> ans = new ArrayList<>();
-        for (int hori = minHD; hori <= maxHD; hori++) {
-            List<int[]> nodes = map.getOrDefault(hori, new ArrayList<>());
-            nodes.sort((a, b) -> a[0] != b[0] ? a[0] - b[0] : a[1] - b[1]);
-            List<Integer> level = new ArrayList<>();
-            for (int[] node : nodes) {
-                level.add(node[1]);
-            }
-            ans.add(level);
-        }
-        return ans;
-    }
-    
-    private void dfs(TreeNode root, int lvl_h, int lvl_v) {
-        if (root == null) {
-            return;
-        }
-        minHD = Math.min(minHD, lvl_h);
-        maxHD = Math.max(maxHD, lvl_h);
-        
-        map.putIfAbsent(lvl_h, new ArrayList<>());
-        map.get(lvl_h).add(new int[]{lvl_v, root.val});
-        
-        dfs(root.left, lvl_h - 1, lvl_v + 1);
-        dfs(root.right, lvl_h + 1, lvl_v + 1);
-    }
-}
-"""
-
-# Java code using 'Treemap and Heap'
+# Java Code 
 """
 import java.util.*;
 
+class TreeNode {
+    int val;
+    TreeNode left, right;
+    TreeNode(int x) { val = x; }
+}
+
 class Solution {
-    // TreeMap to store nodes based on horizontal distance (lvl_h) and vertical distance (lvl_v)
-    private Map<Integer, TreeMap<Integer, PriorityQueue<Integer>>> map = new TreeMap<>();
-    
+    int min_h = 0, max_h = 0;  // minimum horizonatl level and maximum horizontal level
+    Map<Integer, List<int[]>> map = new HashMap<>();  // [horizontal_level:(vertcial_level, node.val)]
+
     public List<List<Integer>> verticalTraversal(TreeNode root) {
-        // Perform DFS traversal to populate the map
-        dfs(root, 0, 0);
-        
+        dfs(root, 0, 0);   // just a traversla can say preorder
+
         List<List<Integer>> ans = new ArrayList<>();
-        // Iterate over horizontal distances in sorted order
-        for (TreeMap<Integer, PriorityQueue<Integer>> ys : map.values()) {
+        // now print the all nodes horizonatl level wise, and store the value by key before adding into ans for same vertcial level
+        for (int hori = min_h; hori <= max_h; hori++) {
+            List<int[]> pairs = map.get(hori);
+            Collections.sort(pairs, (a, b) -> a[0] == b[0] ? Integer.compare(a[1], b[1]) : Integer.compare(a[0], b[0]));
             List<Integer> level = new ArrayList<>();
-            // Iterate over vertical levels in sorted order
-            for (PriorityQueue<Integer> nodes : ys.values()) {
-                // Extract nodes in sorted order (since PriorityQueue sorts them automatically)
-                while (!nodes.isEmpty()) {
-                    level.add(nodes.poll());
-                }
+            for (int[] p : pairs) {
+                level.add(p[1]);
             }
-            ans.add(level); // Add sorted nodes for this horizontal level to the answer
+            ans.add(level); 
         }
         return ans;
     }
-    
-    private void dfs(TreeNode root, int lvl_h, int lvl_v) {
+
+    // level horizontal, level vertical.. just preorder logic only. same we did in above method to find the horizontal range
+    void dfs(TreeNode root, int lvl_h, int lvl_v) {
         if (root == null) {
             return;
         }
-        
-        // Insert node into the map at the correct (horizontal, vertical) position
-        map.putIfAbsent(lvl_h, new TreeMap<>());
-        map.get(lvl_h).putIfAbsent(lvl_v, new PriorityQueue<>());
-        map.get(lvl_h).get(lvl_v).offer(root.val);
-        
-        // Recursively traverse left and right children
-        dfs(root.left, lvl_h - 1, lvl_v + 1); // Move left: decrease horizontal level, increase vertical level
-        dfs(root.right, lvl_h + 1, lvl_v + 1); // Move right: increase horizontal level, increase vertical level
+        min_h = Math.min(min_h, lvl_h);
+        max_h = Math.max(max_h, lvl_h);
+        map.computeIfAbsent(lvl_h, k -> new ArrayList<>()).add(new int[]{lvl_v, root.val});
+        dfs(root.left, lvl_h - 1, lvl_v + 1);  // left node lies at (col-1,row+1), horizontal level->column and vertical level -> row
+        dfs(root.right, lvl_h + 1, lvl_v + 1); // right node lies at (col+1,row+1)
     }
 }
-
 """
+# C++ Code 
+"""
+#include <vector>
+#include <map>
+#include <algorithm>
+using namespace std;
 
-# do by iterative way later all the view based q
+struct TreeNode {
+    int val;
+    TreeNode *left;
+    TreeNode *right;
+    TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+};
 
-# Related Q:
-# 1) Top View of Binary Tree
-# ans: you have to print the 1st node at each horizontal level from top(minimum x_coodinate)
+class Solution {
+public:
+    int min_h = 0, max_h = 0;  // minimum horizonatl level and maximum horizontal level
+    map<int, vector<pair<int, int>>> dic;   // [horizontal_level:(vertcial_level, node.val)]
 
-# 2) Bottom View of Binary Tree
-# Ans: you have to print the 1st node at each horizonatl level from bottom(maximum x_coordinate)
+    vector<vector<int>> verticalTraversal(TreeNode* root) {
+        dfs(root, 0, 0);   // just a traversla can say preorder
+
+        vector<vector<int>> ans;
+        // now print the all nodes horizonatl level wise, and store the value by key before adding into ans for same vertcial level
+        for (int hori = min_h; hori <= max_h; ++hori) {
+            vector<pair<int, int>>& vec = dic[hori];
+            sort(vec.begin(), vec.end());  // will sort the the value according to the 1st ele in value
+            vector<int> level;
+            for (auto& [v, val] : vec) {
+                level.push_back(val);
+            }
+            ans.push_back(level);
+        }
+        return ans;
+    }
+
+    // level horizontal, level vertical.. just preorder logic only. same we did in above method to find the horizontal range
+    void dfs(TreeNode* root, int lvl_h, int lvl_v) {
+        if (!root) return;
+        min_h = min(min_h, lvl_h);
+        max_h = max(max_h, lvl_h);
+        dic[lvl_h].emplace_back(lvl_v, root->val);
+        dfs(root->left, lvl_h - 1, lvl_v + 1);  // left node lies at (col-1,row+1)
+        dfs(root->right, lvl_h + 1, lvl_v + 1); // right node lies at (col+1,row+1)
+    }
+};
+"""

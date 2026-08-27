@@ -1,4 +1,5 @@
-# method 1: very direct and simple. Brute Force
+# method 1: 
+# very direct and simple. Brute Force
 # just add the num into a list and for median sort the list and return the ans according to the length of the list
 # every time median is called, we are sorting the array 
 # time: O(1*log1+ 2*log2+ 3*log3 + 4*log4..... + (5*10^4)*log(5*10^4))
@@ -17,7 +18,64 @@ class MedianFinder:
         else:
             return (self.nums[mid] + self.nums[mid-1])/2
 
-# method 2:
+# Java Code 
+"""
+import java.util.*;
+
+class MedianFinder {
+    private List<Integer> nums;
+
+    public MedianFinder() {
+        nums = new ArrayList<>();
+    }
+
+    public void addNum(int num) {
+        nums.add(num);
+    }
+
+    public double findMedian() {
+        Collections.sort(nums);
+        int mid = nums.size() / 2;
+        if (nums.size() % 2 != 0) {
+            return nums.get(mid);
+        } else {
+            return (nums.get(mid) + nums.get(mid - 1)) / 2.0;
+        }
+    }
+}
+"""
+# C++ Code 
+"""
+#include <vector>
+#include <algorithm>
+
+class MedianFinder {
+private:
+    std::vector<int> nums;
+
+public:
+    MedianFinder() {
+        // initialize empty vector
+    }
+
+    void addNum(int num) {
+        nums.push_back(num);
+    }
+
+    double findMedian() {
+        std::sort(nums.begin(), nums.end());
+        int mid = nums.size() / 2;
+        if (nums.size() % 2 != 0) {
+            return nums[mid];
+        } else {
+            return (nums[mid] + nums[mid - 1]) / 2.0;
+        }
+    }
+};
+""" 
+
+# other way for python user
+
 # If we can find any data structure which :
 # 1) Automtically store element in sorted order in less than O(n) 
 # 2) add, delete operation in O(n) then we can solve this question.
@@ -43,7 +101,7 @@ class MedianFinder:
         return (self.lst[n//2 -1] + self.lst[n//2])/2
 
 
-# method 3:
+# method 2:
 # Most important for interview.
 
 # Logic: If we can get two middle in case of even no of elements and middle one in case of odd no of elements
@@ -97,6 +155,27 @@ class MedianFinder:
 
 # time: O(n*logk)
 
+
+# my mistake:
+# was adding directly first into the 'minHeap' then was checking length .
+# may give wrong ans in case of odd ele because median can be in the 'maxHeap' in this case.
+class MedianFinder:  
+    def __init__(self):
+        self.maxHeap, self.minHeap= [], []
+        
+    def addNum(self, num: int) -> None:
+        heapq.heappush(self.minHeap, num)
+        if len(self.minHeap) > len(self.maxHeap) + 1:
+            heapq.heappush(self.maxHeap, -1*heapq.heappop(self.minHeap))
+
+    def findMedian(self) -> float:
+        if len(self.minHeap)!= len(self.maxHeap): # median is in minHeap at the top
+            return self.minHeap[0]
+        # if length is equal then return the average
+        return (self.minHeap[0] - self.maxHeap[0])/2
+    
+# Correct code 
+
 import heapq
 class MedianFinder:  
     def __init__(self):
@@ -117,24 +196,251 @@ class MedianFinder:
         return (self.minHeap[0] - self.maxHeap[0])/2  # return (self.minHeap[0] + -1*self.maxHeap[0])/2
 
 
-# my mistake method 4:
-# was adding directly first into the 'minHeap' then was checking length .
-# may give wrong ans in case of odd ele because median can be in the 'maxHeap' in this case.
-class MedianFinder:  
-    def __init__(self):
-        self.maxHeap, self.minHeap= [], []
+
+# 1st follow ups :
+"""
+1. If all integer numbers from the stream are in the range [0, 100], how would you optimize your solution?
+
+Logic & Thought Process
+1. The Problem: Heaps take O(logN) time. If N becomes millions, even logN adds up.
+2. The Solution: Use an array buckets of size 101.
+    buckets[i] stores the count of how many times number i has appeared.
+    Keep a total_count of all numbers.
         
+3. Finding Median:
+    To find the kth element, iterate through the buckets and keep a running_sum.
+    The first index where running_sum >= k is our value.
+    Since the array is only 101 elements, this "search" is a constant time operation O(101), which we treat as O(1).
+"""
+class MedianFinderRange:
+    def __init__(self):
+        # Index 0 to 100
+        self.buckets = [0] * 101
+        self.total_count = 0
+
     def addNum(self, num: int) -> None:
-        heapq.heappush(self.minHeap, num)
-        if len(self.minHeap) > len(self.maxHeap) + 1:
-            heapq.heappush(self.maxHeap, -1*heapq.heappop(self.minHeap))
+        # Increment frequency of the number
+        self.buckets[num] += 1
+        self.total_count += 1
+
+    def _get_kth(self, k: int) -> int:
+        # Helper to find the k-th smallest element in the bucket array
+        count_so_far = 0
+        for i in range(101):
+            count_so_far += self.buckets[i]
+            if count_so_far >= k:
+                return i
+        return 0
 
     def findMedian(self) -> float:
-        if len(self.minHeap)!= len(self.maxHeap): # median is in minHeap at the top
-            return self.minHeap[0]
-        # if length is equal then return the average
-        return (self.minHeap[0] - self.maxHeap[0])/2
+        # If odd: return the middle element
+        if self.total_count % 2 == 1:
+            return float(self._get_kth(self.total_count // 2 + 1))
+        else:
+            # If even: return average of the two middle elements
+            left = self._get_kth(self.total_count // 2)
+            right = self._get_kth(self.total_count // 2 + 1)
+            return (left + right) / 2.0
 
+# 2nd Follow ups
+"""
+Q) If 99% of all integer numbers from the stream are in the range [0, 100], how would you optimize your solution?
+
+Logic & Thought Process
+1. The Problem: Most data is in [0, 100], but 1% are "outliers" (e.g., -500 or 10,000).
+2. The Solution: Use a Hybrid Approach.
+    Part A: less_than_zero (A counter or a Max-Heap for outliers below 0).
+    Part B: buckets (Size 101 array for the range [0, 100]).
+    Part C: greater_than_100 (A counter or a Min-Heap for outliers above 100).
+
+3. Optimization Note: If we only care about the median, and 99% of data is in the center, the median must fall inside the buckets. 
+We only need the count of outliers to know how many "steps" to skip before counting into the buckets.
+"""
+
+import heapq
+
+class MedianFinderOutlierAware:
+    def __init__(self):
+        self.buckets = [0] * 101
+        self.low_outliers = []   # Max-heap (smaller half outliers)
+        self.high_outliers = []  # Min-heap (larger half outliers)
+        self.total_count = 0
+
+    def addNum(self, num: int) -> None:
+        if 0 <= num <= 100:
+            self.buckets[num] += 1
+        elif num < 0:
+            # Python uses min-heaps, so we store negative to simulate max-heap
+            heapq.heappush(self.low_outliers, -num)
+        else:
+            heapq.heappush(self.high_outliers, num)
+        self.total_count += 1
+
+    def _get_kth(self, k: int) -> float:
+        # Step 1: Is it in the low outliers?
+        if k <= len(self.low_outliers):
+            # Sort only the 1% outliers to find the exact value
+            return float(sorted([-x for x in self.low_outliers])[k-1])
+        
+        # Step 2: Is it in the buckets (0-100)?
+        k -= len(self.low_outliers)
+        count_so_far = 0
+        for i in range(101):
+            count_so_far += self.buckets[i]
+            if count_so_far >= k:
+                return float(i)
+        
+        # Step 3: It MUST be in the high outliers (> 100)
+        k -= sum(self.buckets)
+        return float(sorted(self.high_outliers)[k-1])
+
+    def findMedian(self) -> float:
+        if self.total_count == 0: return 0.0
+        
+        if self.total_count % 2 == 1:
+            return self._get_kth(self.total_count // 2 + 1)
+        else:
+            m1 = self._get_kth(self.total_count // 2)
+            m2 = self._get_kth(self.total_count // 2 + 1)
+            return (m1 + m2) / 2.0
+
+# Java Code 
+"""
+import java.util.PriorityQueue;
+import java.util.Collections;
+
+class MedianFinder {
+    PriorityQueue<Integer> maxHeap; // maxHeap to store the smaller half
+    PriorityQueue<Integer> minHeap; // minHeap to store the larger half
+
+    public MedianFinder() {
+        maxHeap = new PriorityQueue<>(Collections.reverseOrder());
+        minHeap = new PriorityQueue<>();
+    }
+
+    public void addNum(int num) {
+        minHeap.offer(num);
+        if (minHeap.size() > maxHeap.size() + 1) {
+            maxHeap.offer(minHeap.poll() * -1); // move top of minHeap to maxHeap (invert sign)
+        }
+    }
+
+    public double findMedian() {
+        if (minHeap.size() != maxHeap.size()) { // median is in minHeap at the top
+            return minHeap.peek();
+        }
+        // if length is equal then return the average
+        return (minHeap.peek() - (-1 * maxHeap.peek())) / 2.0;
+    }
+}
+
+//Corrected code 
+import java.util.PriorityQueue;
+import java.util.Collections;
+
+class MedianFinder {
+    PriorityQueue<Integer> maxHeap; // maxHeap to store the smaller half
+    PriorityQueue<Integer> minHeap; // minHeap to store the larger half
+
+    public MedianFinder() {
+        maxHeap = new PriorityQueue<>(Collections.reverseOrder());
+        minHeap = new PriorityQueue<>();
+    }
+
+    public void addNum(int num) {
+        if (minHeap.size() == maxHeap.size()) {
+            // First push 'num' into maxHeap then pop one ele from maxHeap and at last add that to minHEap.
+            maxHeap.offer(num);
+            minHeap.offer(maxHeap.poll());
+        } else {
+            // First push 'num' into minHeap then pop one ele from minHeap and at last add that to maxHEap.
+            minHeap.offer(num);
+            maxHeap.offer(minHeap.poll());
+        }
+    }
+
+    public double findMedian() {
+        if (minHeap.size() != maxHeap.size()) { // median is in minHeap at the top
+            return minHeap.peek();
+        }
+        // if length is equal then return the average
+        return (minHeap.peek() - maxHeap.peek()) / 2.0; // return (minHeap.peek() + -1*maxHeap.peek())/2
+    }
+}
+
+
+"""
+# C++ Code 
+"""
+#include <queue>
+#include <vector>
+using namespace std;
+
+class MedianFinder {
+    priority_queue<int> maxHeap; // maxHeap to store the smaller half
+    priority_queue<int, vector<int>, greater<int>> minHeap; // minHeap to store the larger half
+
+public:
+    MedianFinder() {
+        // Constructor
+    }
+
+    void addNum(int num) {
+        minHeap.push(num);
+        if (minHeap.size() > maxHeap.size() + 1) {
+            maxHeap.push(-1 * minHeap.top()); // move top of minHeap to maxHeap (invert sign)
+            minHeap.pop();
+        }
+    }
+
+    double findMedian() {
+        if (minHeap.size() != maxHeap.size()) { // median is in minHeap at the top
+            return minHeap.top();
+        }
+        // if length is equal then return the average
+        return (minHeap.top() - (-1 * maxHeap.top())) / 2.0;
+    }
+};
+//corrected code 
+#include <queue>
+#include <vector>
+using namespace std;
+
+class MedianFinder {
+    priority_queue<int> maxHeap; // maxHeap to store the smaller half
+    priority_queue<int, vector<int>, greater<int>> minHeap; // minHeap to store the larger half
+
+public:
+    MedianFinder() {
+        // Constructor
+    }
+
+    void addNum(int num) {
+        if (minHeap.size() == maxHeap.size()) {
+            // First push 'num' into maxHeap then pop one ele from maxHeap and at last add that to minHEap.
+            maxHeap.push(num);
+            minHeap.push(maxHeap.top());
+            maxHeap.pop();
+        } else {
+            // First push 'num' into minHeap then pop one ele from minHeap and at last add that to maxHEap.
+            minHeap.push(num);
+            maxHeap.push(minHeap.top());
+            minHeap.pop();
+        }
+    }
+
+    double findMedian() {
+        if (minHeap.size() != maxHeap.size()) { // median is in minHeap at the top
+            return minHeap.top();
+        }
+        // if length is equal then return the average
+        return (minHeap.top() - maxHeap.top()) / 2.0; // return (minHeap.top() + -1*maxHeap.top())/2
+    }
+};
+
+""" 
+
+# Extesnion: 
 # Note: In this type of Q or similar question like :
 "2102. Sequentially Ordinal Rank Tracker" 
 
@@ -143,46 +449,3 @@ class MedianFinder:
 
 # "2102. Sequentially Ordinal Rank Tracker" :
 # only one element matter to us for our ans.
-
-
-# java
-"""
-// Not able to find data structure which function same as 'sortedList' in java.
-# We can use TreeSet to maintain a sorted collection of numbers and add/ delete operation in O(logn) but TreeSet does not allow duplicates.
-# so Treeset won't work here.
-
-// method 3: Using two heaps
-
-class MedianFinder {
-    private PriorityQueue<Integer> maxHeap;
-    private PriorityQueue<Integer> minHeap;
-    
-    public MedianFinder() {
-        // Max-heap (contains the smaller half of the numbers)
-        maxHeap = new PriorityQueue<>((a,b)-> b - a);
-        // Min-heap (contains the larger half of the numbers)
-        minHeap = new PriorityQueue<>();
-    }
-    
-    public void addNum(int num) {
-        if (minHeap.size() == maxHeap.size()) {
-            // First push 'num' into maxHeap then pop one element from maxHeap and at last add that to minHeap.
-            maxHeap.offer(num);
-            minHeap.offer(maxHeap.poll());
-        } else {
-            // First push 'num' into minHeap then pop one element from minHeap and at last add that to maxHeap.
-            minHeap.offer(num);
-            maxHeap.offer(minHeap.poll());
-        }
-    }
-    
-    public double findMedian() {
-        if (minHeap.size() != maxHeap.size()) {
-            // Median is in minHeap at the top
-            return minHeap.peek();
-        }
-        // If lengths are equal, return the average
-        return (minHeap.peek() + maxHeap.peek()) / 2.0;
-    }
-}
-"""

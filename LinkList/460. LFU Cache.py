@@ -1,3 +1,5 @@
+# Method 1: 
+
 # Logic: Similar to 'LRU cache'.
 # But we need to  :
 # 1) Keep track of frequency of key till now so for this we will need one more member in 'Node'
@@ -7,6 +9,9 @@
 
 # for this we will need one more hashmap for storing all the elements having same frequency in 'LRU' form.
 # Because using single map of 'LRU' won't be able to handle the frequency case.
+
+# Time: O(1) for each 'get' and 'put' , Space = O(Capacity) because maximum element can be this only at a time.
+
 
 class ListNode:
     def __init__(self, key , val):
@@ -95,188 +100,231 @@ class LFUCache:
 
 # Java
 """
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.Deque;
+import java.util.*;
 
 class ListNode {
-    int key;
-    int val;
-    int freq;
+    int key, val, freq = 1;
     ListNode prev, next;
 
     public ListNode(int key, int val) {
         this.key = key;
         this.val = val;
-        this.freq = 1;
     }
 }
 
+// This we will pass as type inside 'freqTable'.
 class DLL {
-    ListNode Lru, Mru;
+    ListNode Lru;
+    ListNode Mru;
     int size;
 
     public DLL() {
-        Lru = new ListNode(0, 0);
-        Mru = new ListNode(0, 0);
+        // Just same as 'LRU' because in case of same freq we have to remove 'least recently used'.
+        this.Lru = new ListNode(0, 0);
+        this.Mru = new ListNode(0, 0);
         Lru.next = Mru;
         Mru.prev = Lru;
         size = 0;
     }
 
+    // same as 'LRU'. Key having same freq will be inserted at last i.e now will be most recently used.
     public void insertAtLast(ListNode node) {
-        ListNode nodePre = Mru.prev;
-        nodePre.next = node;
+        ListNode nodePre = Mru.prev;  // storing the pre of mru
+        Mru.prev.next = node;
         node.prev = nodePre;
         node.next = Mru;
+        nodePre.next = node;
         Mru.prev = node;
         size++;
     }
 
+    // Remove any general node.  # same as 'LRU'
     public void removeNode(ListNode node) {
-        ListNode pre = node.prev;
-        ListNode next = node.next;
-        pre.next = next;
-        next.prev = pre;
+        node.prev.next = node.next;
+        node.next.prev = node.prev;
         size--;
     }
 
     public ListNode removeFirst() {
-        if (size == 0) {
-            return null;
-        }
         ListNode nodeToRemove = Lru.next;
         removeNode(nodeToRemove);
         return nodeToRemove;
     }
 }
 
-public class LFUCache {
-    private int capacity;
-    private int minFreq;
-    private Map<Integer, ListNode> cache;
-    private Map<Integer, DLL> freqTable;
+class LFUCache {
+    int capacity, minFreq;
+    Map<Integer, ListNode> cache;
+    Map<Integer, DLL> freqTable;
 
     public LFUCache(int capacity) {
         this.capacity = capacity;
         this.minFreq = 0;
-        this.cache = new HashMap<>();
-        this.freqTable = new HashMap<>();
+        cache = new HashMap<>();
+        freqTable = new HashMap<>();
     }
 
+    // will update the freq of given key and after that , it will remove cur node from prev freq and
+    // then will add the cur 'key-value' to new frequency.
     private int updateCache(int key, int value) {
         ListNode node = cache.get(key);
         node.val = value;
-        int prevFreq = node.freq;
-        node.freq++;
-        freqTable.get(prevFreq).removeNode(node);
+        int prevFreq = node.freq;  // have to remove from this freq
+        node.freq++;               // will insert in this new_freq
 
-        if (!freqTable.containsKey(node.freq)) {
-            freqTable.put(node.freq, new DLL());
-        }
-        freqTable.get(node.freq).insertAtLast(node);
+        freqTable.get(prevFreq).removeNode(node);   // Removing from prevFreq
+        freqTable.putIfAbsent(node.freq, new DLL());
+        freqTable.get(node.freq).insertAtLast(node);  // Inserting in new_freq
 
+        // If 'minFreq' was = prevFreq and there was only 'key' for 'minFreq' then we have to update the minFreq += 1
         if (prevFreq == minFreq && freqTable.get(prevFreq).size == 0) {
             minFreq++;
         }
+
         return node.val;
     }
 
     public int get(int key) {
-        if (!cache.containsKey(key)) {
-            return -1;
-        }
+        if (!cache.containsKey(key)) return -1;
         return updateCache(key, cache.get(key).val);
     }
 
     public void put(int key, int value) {
-        if (capacity == 0) {
-            return;
-        }
+        if (capacity == 0) return;
+
         if (cache.containsKey(key)) {
             updateCache(key, value);
         } else {
             if (cache.size() == capacity) {
-                DLL minFreqList = freqTable.get(minFreq);
-                ListNode toRemove = minFreqList.removeFirst();
+                // Remove the lru key having minimum frequency
+                ListNode toRemove = freqTable.get(minFreq).removeFirst();
                 cache.remove(toRemove.key);
             }
-            ListNode newNode = new ListNode(key, value);
-            if (!freqTable.containsKey(1)) {
-                freqTable.put(1, new DLL());
-            }
-            freqTable.get(1).insertAtLast(newNode);
-            cache.put(key, newNode);
-            minFreq = 1;
+
+            // Now put this 'key' in freqTable with freq = 1 and in cache
+            ListNode node = new ListNode(key, value);
+            freqTable.putIfAbsent(1, new DLL());
+            freqTable.get(1).insertAtLast(node);
+            cache.put(key, node);
+            minFreq = 1;  // Since inserting new node so minFreq = 1 only
         }
     }
 }
 """
 
-# Try to do in more concise way later
-# https://leetcode.com/problems/lfu-cache/solutions/166683/python-only-use-ordereddict-get-o-1-put-o-1-simple-and-brief-explained/
-# https://leetcode.com/problems/lfu-cache/solutions/369104/python-two-dicts-explanation/
 
-
-# Related Question
+# C++
 """
-1) Asked in FAANG. Exact same as LFU
+#include <unordered_map>
+using namespace std;
 
-Imagine you're building an online music streaming app that allows users to store a playlist of their favorite songs. 
-The app has a feature that shows the most popular songs based on how often they’ve been played.
+class ListNode {
+public:
+    int key, val, freq = 1;
+    ListNode* prev;
+    ListNode* next;
 
+    ListNode(int k, int v) {
+        key = k;
+        val = v;
+        prev = next = nullptr;
+    }
+};
 
-However, the playlist can only hold a limited number of songs. 
-If the user tries to add more songs than the playlist can hold, the app needs to remove some songs to make room 
-for the new ones. 
-But the app has specific rules on which songs to remove:
+// This we will pass as type inside 'freqTable'.
+class DLL {
+public:
+    ListNode* Lru;
+    ListNode* Mru;
+    int size;
 
-Least Played Songs: The song that has been played the least will be removed first.
+    DLL() {
+        // Just same as 'LRU' because in case of same freq we have to remove 'least recently used'.
+        Lru = new ListNode(0, 0);
+        Mru = new ListNode(0, 0);
+        Lru->next = Mru;
+        Mru->prev = Lru;
+        size = 0;
+    }
 
-Tie-breaker: If multiple songs have been played the same number of times, the song that was added to the playlist 
-the longest time ago will be removed.
+    // same as 'LRU'. Key having same freq will be inserted at last i.e now will be most recently used.
+    void insertAtLast(ListNode* node) {
+        ListNode* nodePre = Mru->prev;  // storing the pre of mru
+        Mru->prev->next = node;
+        node->prev = nodePre;
+        node->next = Mru;
+        nodePre->next = node;
+        Mru->prev = node;
+        size++;
+    }
 
-Your Task
-Design a data structure called PlaylistManager to manage the playlist with the following operations:
+    // Remove any general node.  # same as 'LRU'
+    void removeNode(ListNode* node) {
+        node->prev->next = node->next;
+        node->next->prev = node->prev;
+        size--;
+    }
 
-class PlaylistManager:
-    def __init__(self, capacity: int)
-    def get_song(self, song_id: int) -> int
-    def add_song(self, song_id: int, song_details: int) -> None
-**/
+    ListNode* removeFirst() {
+        ListNode* nodeToRemove = Lru->next;
+        removeNode(nodeToRemove);
+        return nodeToRemove;
+    }
+};
 
+class LFUCache {
+private:
+    int capacity, minFreq;
+    unordered_map<int, ListNode*> cache;
+    unordered_map<int, DLL*> freqTable;
 
-Sample 1:
-const manager = new PlaylistManager(2);
-manager.add_song(1, 100); // Add song 1
-manager.add_song(2, 200); // Add song 2
+    // will update the freq of given key and after that , it will remove cur node from prev freq and
+    // then will add the cur 'key-value' to new frequency.
+    int updateCache(int key, int value) {
+        ListNode* node = cache[key];
+        node->val = value;
+        int prevFreq = node->freq;
+        node->freq++;
 
-console.log(manager.get_song(1)); // Output: 1
-console.log(manager.get_song(2)); // Output: 2
-console.log(manager.get_song(3)); // Output: -1 (not present)
+        freqTable[prevFreq]->removeNode(node);
+        if (!freqTable.count(node->freq)) freqTable[node->freq] = new DLL();
+        freqTable[node->freq]->insertAtLast(node);
 
-Sample 2:
-const manager = new PlaylistManager(2);
-manager.add_song(1, 100); // song 1, freq 1      
-manager.add_song(2, 200); // song 2, freq 1
-manager.get_song(1);      // song 1, freq 2
+        if (prevFreq == minFreq && freqTable[prevFreq]->size == 0) {
+            minFreq++;
+        }
 
-manager.add_song(3, 300); // should evict song 2 
+        return node->val;
+    }
 
-console.log(manager.get_song(1)); // Output: 1
-console.log(manager.get_song(2)); // Output: -1 (evicted)
-console.log(manager.get_song(3)); // Output: 3
+public:
+    LFUCache(int capacity) {
+        this->capacity = capacity;
+        this->minFreq = 0;
+    }
 
-const manager = new PlaylistManager(2);
-manager.add_song(1, 100);
-manager.add_song(2, 200);
-manager.add_song(1, 150); // Updates freq of song 1
+    int get(int key) {
+        if (!cache.count(key)) return -1;
+        return updateCache(key, cache[key]->val);
+    }
 
-manager.add_song(3, 300); // song 2 should be evicted
+    void put(int key, int value) {
+        if (capacity == 0) return;
 
-console.log(manager.get_song(1)); // Output: 1
-console.log(manager.get_song(2)); // Output: -1
-console.log(manager.get_song(3)); // Output: 3
+        if (cache.count(key)) {
+            updateCache(key, value);
+        } else {
+            if (cache.size() == capacity) {
+                ListNode* toRemove = freqTable[minFreq]->removeFirst();
+                cache.erase(toRemove->key);
+            }
+
+            ListNode* node = new ListNode(key, value);
+            if (!freqTable.count(1)) freqTable[1] = new DLL();
+            freqTable[1]->insertAtLast(node);
+            cache[key] = node;
+            minFreq = 1;
+        }
+    }
+};
 """

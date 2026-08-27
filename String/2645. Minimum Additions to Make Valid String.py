@@ -19,7 +19,7 @@
 # if c >= pre, k++.
 # last return 4*k - n
 
-# time: O(n)
+# time: O(n), space : O(1)
 class Solution:
     def addMinimum(self, word: str) -> int:
         pre= 'z'  # any very large char , it must be greater than the all the char in string.
@@ -30,7 +30,47 @@ class Solution:
             pre= c
         return 3*k - len(word)
     
+# Java Code 
+"""
+class Solution {
+    public int addMinimum(String word) {
+        char pre = 'z'; // any very large char, must be greater than all chars in the string
+        int k = 0;
 
-# method 2...
-# Try by other methods given in sheet.
+        for (char c : word.toCharArray()) {
+            if (c <= pre) {
+                k++;
+            }
+            pre = c;
+        }
+
+        return 3 * k - word.length();
+    }
+}
+"""
+
+# C++ Code 
+"""
+#include <string>
+
+using namespace std;
+
+class Solution {
+public:
+    int addMinimum(string word) {
+        char pre = 'z'; // any very large char, must be greater than all chars in the string
+        int k = 0;
+
+        for (char c : word) {
+            if (c <= pre) {
+                k++;
+            }
+            pre = c;
+        }
+
+        return 3 * k - word.length();
+    }
+};
+"""
+
 

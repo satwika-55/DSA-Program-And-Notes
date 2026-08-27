@@ -9,23 +9,79 @@ But in Binary Search tree, we can decide.
 just traverse till you find both the nodes in different subtree,
 as soon as you will find the nodes in different subtree that will be the ans 
 as the current node will be the parent for both.
+
+Note : No need to traverse from bottom to up like Binary Tree because we are just finding the node from which two nodes will diverge. 
+
+Time : O(Height) , in average : O(logN), worst : O(N) : skew tree
 """
 
 class Solution:
     def lowestCommonAncestor(self, root: 'TreeNode', p: 'TreeNode', q: 'TreeNode') -> 'TreeNode':
         # if root== None:     # No need of this as it won't reach till 'root= None', it will get returned before only
         #     return root
-        # check if both lie in the left subtree of this node
+        # check if both lie in the left subtree of this node, the LCA must be in the left subtree.
         if root.val > p.val and root.val > q.val:  
             return self.lowestCommonAncestor(root.left, p, q)
-        # check if both lie in the right subtree of this node
+        # check if both lie in the right subtree of this node, the LCA must be in the right subtree.
         if root.val < p.val and root.val < q.val:   
             return self.lowestCommonAncestor(root.right, p, q)
         # means one lie left and other lie in right or (one tree is LCA of other) so return root itself
         return root
 
+# Java Code 
+"""
+class TreeNode {
+    int val;
+    TreeNode left, right;
+    TreeNode(int x) { val = x; }
+}
+
+class Solution {
+    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+        // if root== None:     // No need of this as it won't reach till 'root= None', it will get returned before only
+        //     return root
+        // check if both lie in the left subtree of this node
+        if (root.val > p.val && root.val > q.val) {  
+            return lowestCommonAncestor(root.left, p, q);
+        }
+        // check if both lie in the right subtree of this node
+        if (root.val < p.val && root.val < q.val) {   
+            return lowestCommonAncestor(root.right, p, q);
+        }
+        // means one lie left and other lie in right or (one tree is LCA of other) so return root itself
+        return root;
+    }
+}
+"""
+# C++ Code 
+"""
+struct TreeNode {
+    int val;
+    TreeNode* left;
+    TreeNode* right;
+    TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+};
+
+class Solution {
+public:
+    TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+        // if root== None:     // No need of this as it won't reach till 'root= None', it will get returned before only
+        //     return root
+        // check if both lie in the left subtree of this node
+        if (root->val > p->val && root->val > q->val) {  
+            return lowestCommonAncestor(root->left, p, q);
+        }
+        // check if both lie in the right subtree of this node
+        if (root->val < p->val && root->val < q->val) {   
+            return lowestCommonAncestor(root->right, p, q);
+        }
+        // means one lie left and other lie in right or (one tree is LCA of other) so return root itself
+        return root;
+    }
+};
+"""
 # Method 2:
-# iterative way of above
+# iterative way of Method 1
 class Solution:
     def lowestCommonAncestor(self, root: 'TreeNode', p: 'TreeNode', q: 'TreeNode') -> 'TreeNode':
         while root:
@@ -36,36 +92,52 @@ class Solution:
             else: # means one lie left and other lie in right or (one tree is LCA of other) so return root itself
                 return root
 
-# Java
-"""
-// method 1:
 
-public class Solution {
-    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
-        if (root.val > p.val && root.val > q.val) {  // both nodes are in the left subtree
-            return lowestCommonAncestor(root.left, p, q);
-        }
-        if (root.val < p.val && root.val < q.val) {  // both nodes are in the right subtree
-            return lowestCommonAncestor(root.right, p, q);
-        }
-        // One node is in the left subtree and the other is in the right subtree, or one node is the LCA of the other
-        return root;
-    }
+# Java Code 
+"""
+class TreeNode {
+    int val;
+    TreeNode left, right;
+    TreeNode(int x) { val = x; }
 }
 
-// method 2:
-public class Solution {
+class Solution {
     public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
         while (root != null) {
-            if (root.val > p.val && root.val > q.val) {  // both nodes are in the left subtree
+            if (root.val > p.val && root.val > q.val) {  // both lie in the left subtree of that node
                 root = root.left;
-            } else if (root.val < p.val && root.val < q.val) {  // both nodes are in the right subtree
+            } else if (root.val < p.val && root.val < q.val) {   // both lie in the right subtree of that node
                 root = root.right;
-            } else {  // One node is in the left subtree and the other is in the right subtree. So root is the ans
+            } else { // means one lie left and other lie in right or (one tree is LCA of other) so return root itself
                 return root;
             }
         }
-        return null;  // In case root is null
+        return null;
     }
 }
+"""
+# C++ Code 
+"""
+struct TreeNode {
+    int val;
+    TreeNode* left;
+    TreeNode* right;
+    TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+};
+
+class Solution {
+public:
+    TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+        while (root != nullptr) {
+            if (root->val > p->val && root->val > q->val) {  // both lie in the left subtree of that node
+                root = root->left;
+            } else if (root->val < p->val && root->val < q->val) {   // both lie in the right subtree of that node
+                root = root->right;
+            } else { // means one lie left and other lie in right or (one tree is LCA of other) so return root itself
+                return root;
+            }
+        }
+        return nullptr;
+    }
+};
 """

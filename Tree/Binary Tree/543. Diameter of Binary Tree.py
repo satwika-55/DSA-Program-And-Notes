@@ -1,3 +1,5 @@
+# method 1: 
+
 """
 Logic: For each node check that is root of the ans.
 
@@ -34,6 +36,64 @@ class Solution:
         Height(root)
         return self.ans
 
+# Java Code 
+"""
+class TreeNode {
+    int val;
+    TreeNode left, right;
+    TreeNode(int x) { val = x; }
+}
+
+class Solution {
+    int ans = 0;
+
+    public int diameterOfBinaryTree(TreeNode root) {
+        Height(root);  // read from here
+        return ans;
+    }
+
+    private int Height(TreeNode root) {   // just exactly logic of height only
+        if (root == null) {
+            return 0;
+        }
+        int left = Height(root.left);
+        int right = Height(root.right);
+        ans = Math.max(ans, left + right);   // ans when 'root' is lcs
+        return 1 + Math.max(left, right);    // root will contribute either to left or right so take max(left, right)
+    }
+}
+"""
+# C++ Code 
+"""
+#include <algorithm>
+using namespace std;
+
+struct TreeNode {
+    int val;
+    TreeNode *left, *right;
+    TreeNode(int x): val(x), left(nullptr), right(nullptr) {}
+};
+
+class Solution {
+public:
+    int ans = 0;
+
+    int diameterOfBinaryTree(TreeNode* root) {
+        Height(root);  // read from here
+        return ans;
+    }
+
+    int Height(TreeNode* root) {   // just exactly logic of height only
+        if (!root) return 0;
+        int left = Height(root->left);
+        int right = Height(root->right);
+        ans = max(ans, left + right);   // ans when 'root' is lcs
+        return 1 + max(left, right);    // root will contribute either to left or right so take max(left, right)
+    }
+};
+"""
+
+# Extension: 
 """
 Note vvi: When we will apply DP in tree then return function and ans can be different .
 so keep updating ans seeing the possible ans and return the function accordingly.
@@ -47,25 +107,3 @@ Related Q:
 """
 
 
-# Java
-"""
-class Solution {
-    int ans;
-
-    public int diameterOfBinaryTree(TreeNode root) {
-        ans = 0;
-        height(root);
-        return ans;
-    }
-
-    private int height(TreeNode root) {
-        if (root == null) {
-            return 0;
-        }
-        int left = height(root.left);
-        int right = height(root.right);
-        ans = Math.max(ans, left + right);
-        return 1 + Math.max(left, right);
-    }
-}
-"""

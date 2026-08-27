@@ -1,3 +1,5 @@
+# Method 1: 
+
 # Note: we can say divisible by 'k' also.
 # Observation vvi: '%' works as complement in subarray problem for 'division' or 'multiple'.
 
@@ -17,6 +19,8 @@
 
 
 # Time complexity: O(n), space complexity: O(min(k, n)) if k != 0, else O(n).
+
+
 class Solution:
     def checkSubarraySum(self, nums: List[int], k: int) -> bool:
         sumTillIndex= {0: -1}   # {modulo_sum: index} # we will get this 'modulus' till index 'i' when we will divide by 'k'.
@@ -33,8 +37,75 @@ class Solution:
                 sumTillIndex[curSum] = i 
         return False
 
-
 # Related Q: 
 # 1)  "974. Subarray Sums Divisible by K"
-# 2) vvi: "2947. Count Beautiful Substrings I" , "2948. Count Beautiful Substrings II".
+# 2) vvi: "2949. Count Beautiful Substrings II".
+
+
+# Java Code 
+"""
+import java.util.*;
+
+class Solution {
+    public boolean checkSubarraySum(int[] nums, int k) {
+        Map<Integer, Integer> sumTillIndex = new HashMap<>();
+        sumTillIndex.put(0, -1);  // {modulo_sum: index}
+        // We will get this 'modulus' till index 'i' when we divide by 'k'.
+        // We may get modulus = 0 later, so to handle that initially, we map {0:-1}.
+        int curSum = 0;
+
+        for (int i = 0; i < nums.length; i++) {
+            curSum += nums[i];
+            curSum %= k;
+
+            if (sumTillIndex.containsKey(curSum)) {  // duplicate remainder
+                int pre = sumTillIndex.get(curSum);
+                if (i - pre >= 2) {
+                    return true;
+                }
+            } else {
+                sumTillIndex.put(curSum, i);
+            }
+        }
+        return false;
+    }
+}
+"""
+
+# C++ Code 
+"""
+#include <iostream>
+#include <vector>
+#include <unordered_map>
+
+using namespace std;
+
+class Solution {
+public:
+    bool checkSubarraySum(vector<int>& nums, int k) {
+        unordered_map<int, int> sumTillIndex = {{0, -1}};  // {modulo_sum: index}
+        // We will get this 'modulus' till index 'i' when we divide by 'k'.
+        // We may get modulus = 0 later, so to handle that initially, we map {0:-1}.
+        int curSum = 0;
+
+        for (int i = 0; i < nums.size(); i++) {
+            curSum += nums[i];
+            curSum %= k;
+
+            if (sumTillIndex.find(curSum) != sumTillIndex.end()) {  // duplicate remainder
+                int pre = sumTillIndex[curSum];
+                if (i - pre >= 2) {
+                    return true;
+                }
+            } else {
+                sumTillIndex[curSum] = i;
+            }
+        }
+        return false;
+    }
+};
+"""
+
+
+
 

@@ -1,3 +1,10 @@
+# Brute force
+"""
+Check from every cell
+Time : O((M*N)^2)
+"""
+
+
 """
 Q meaning: you have to return all that grid in a 2D matrix from which water can flow to both pacific and atlantic ocean
 we are going reverse i.e from ocean to the cells
@@ -42,6 +49,72 @@ class Solution:
 
 
 # method 2: By Bfs using same logic as we did in case of "No of island"
+
+from collections import deque
+
+class Solution:
+    def pacificAtlantic(self, heights: List[List[int]]) -> List[List[int]]:
+        # 1. Edge Case: Check for empty grid
+        if not heights or not heights[0]:
+            return []
+            
+        row, col = len(heights), len(heights[0])
+        
+        # 2. Initialize Queues for BFS and Sets to track reachability
+        pacific_q = deque()
+        atlantic_q = deque()
+        visited_pacific = set()
+        visited_atlantic = set()
+
+        # 3. Boundary Initialization (Multi-Source BFS Start Points)
+        # We start from the cells touching the oceans and "climb" up.
+        
+        # Left (Pacific) and Right (Atlantic) boundaries
+        for r in range(row):
+            # Pacific: First Column
+            pacific_q.append((heights[r][0], r, 0))
+            visited_pacific.add((r, 0))
+            # Atlantic: Last Column
+            atlantic_q.append((heights[r][col - 1], r, col - 1))
+            visited_atlantic.add((r, col - 1))
+            
+        # Top (Pacific) and Bottom (Atlantic) boundaries
+        for c in range(col):
+            # Pacific: First Row
+            if (0, c) not in visited_pacific: # Avoid adding corner twice
+                pacific_q.append((heights[0][c], 0, c))
+                visited_pacific.add((0, c))
+            # Atlantic: Last Row
+            if (row - 1, c) not in visited_atlantic: # Avoid adding corner twice
+                atlantic_q.append((heights[row - 1][c], row - 1, c))
+                visited_atlantic.add((row - 1, c))
+
+        directions = [[-1, 0], [1, 0], [0, -1], [0, 1]]
+
+        # 4. BFS Logic: Explore "upward" (height >= cur_height)
+        def bfs(queue, visited):
+            while queue:
+                # We can remove 'for i in range(len(queue))' unless we need level-order
+                cur_height, r, c = queue.popleft()
+                
+                for dr, dc in directions:
+                    nr, nc = r + dr, c + dc
+                    
+                    # Boundary Check + Visited Check + Elevation Check
+                    # Water can flow DOWN to the ocean if neighbor is HIGHER or EQUAL
+                    if 0 <= nr < row and 0 <= nc < col and \
+                       (nr, nc) not in visited and \
+                       heights[nr][nc] >= cur_height:
+                        
+                        visited.add((nr, nc))
+                        queue.append((heights[nr][nc], nr, nc))
+
+        # Perform BFS for both oceans
+        bfs(pacific_q, visited_pacific)
+        bfs(atlantic_q, visited_atlantic)
+
+        # 5. Intersection: Find cells reachable from BOTH sets
+        return list(visited_pacific & visited_atlantic) 
 
 
 # Java

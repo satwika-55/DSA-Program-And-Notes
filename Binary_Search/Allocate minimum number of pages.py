@@ -1,3 +1,5 @@
+# method 1: 
+
 """
 Time: O(n *log(sum(arr)- max(arr)))
 the best thing about this q is binary search is applicable even array is unsorted
@@ -25,8 +27,21 @@ at last we will return the res
 note: Actually we are checking 'after allocating maximum of no pages as 'mid' to a student , Are we able to divide among all students?'.
 If yes then we will decrease the 'mid' and if no then we will increase the mid.
 in this we are minmising the maximum pages allocated to a student.
-"""
 
+Q) How are we making sure that each student is asigned at least one book ?
+-> 1. say 'mid = 113', and given student  = 5
+If your IsValid function says you only need 3 students to keep every student under 113 pages, and you actually have 5 students available:
+    You can simply take the books assigned to one of those 3 students and split them. 
+    Splitting books never increases the maximum pages a student has. It only decreases or keeps it the same.
+    Therefore, if it's possible with fewer than k students, it is mathematically certain it is possible with exactly k students.
+
+2. Why the Binary Search "Finds" the k case
+Because we are looking for the Minimum possible Maximum:
+    If students_needed < k, the mid is "too loose" (too large).
+    The Binary Search will keep pushing the mid lower (end = mid).
+    As mid gets smaller, the number of students needed will naturally increase.
+    The algorithm eventually stops at the smallest mid where the number of students needed is as close to k as possible without going over.
+"""
 # 2nd template only.
 
 class Solution:
@@ -59,6 +74,95 @@ class Solution:
         # if < M means allocation is possible otherwise not possible
         return False if student > M else True
 
+# Java Code 
+"""
+public class Solution {
+    public int findPages(int[] A, int N, int M) {
+        if (M > N) return -1;
+
+        int start = Integer.MIN_VALUE, end = 0;
+        for (int i = 0; i < N; i++) {
+            start = Math.max(start, A[i]);
+            end += A[i];
+        }
+
+        while (start < end) {
+            int mid = start + (end - start) / 2;
+            if (isValid(A, N, M, mid)) {  // search for even more smaller but mid can be the ans also.
+                end = mid;
+            } else {
+                start = mid + 1;
+            }
+        }
+        return start;
+    }
+
+    // this will tell whether allocation is possible for the decided max_page(mid) or not.
+    // we will start with one student and start allocating books to them as much as possible 
+    // and will count the no of pages in sum for that particular student.
+    private boolean isValid(int[] A, int N, int M, int maxPage) {
+        int student = 1, sum = 0;
+        // try allocating the books
+        for (int i = 0; i < N; i++) {
+            sum += A[i];
+            if (sum > maxPage) {
+                // now we can't allocate further pages to the current selected student. 
+                // in this case we will increase the no of student and start allocating the books to the new student.
+                student++;
+                sum = A[i];
+            }
+        }
+        // and at last we we will compare the no of students with M(# student given in the Q)
+        // if < M means allocation is possible otherwise not possible
+        return student <= M;
+    }
+}
+"""
+# C++ Code 
+"""
+class Solution {
+public:
+    int findPages(vector<int>& A, int N, int M) {
+        if (M > N) return -1;
+
+        int start = *max_element(A.begin(), A.end());
+        int end = accumulate(A.begin(), A.end(), 0);
+
+        while (start < end) {
+            int mid = start + (end - start) / 2;
+            if (isValid(A, N, M, mid)) {  // search for even more smaller but mid can be the ans also.
+                end = mid;
+            } else {
+                start = mid + 1;
+            }
+        }
+        return start;
+    }
+
+    // this will tell whether allocation is possible for the decided max_page(mid) or not.
+    // we will start with one student and start allocating books to them as much as possible 
+    // and will count the no of pages in sum for that particular student.
+    bool isValid(const vector<int>& A, int N, int M, int maxPage) {
+        int student = 1, sum = 0;
+        // try allocating the books
+        for (int i = 0; i < N; i++) {
+            sum += A[i];
+            if (sum > maxPage) {
+                // now we can't allocate further pages to the current selected student. 
+                // in this case we will increase the no of student and start allocating the books to the new student.
+                student++;
+                sum = A[i];
+            }
+        }
+        // and at last we we will compare the no of students with M(# student given in the Q)
+        // if < M means allocation is possible otherwise not possible
+        return student <= M;
+    }
+};
+"""
+
+# Extension: 
+
 # vvi Note: This type of logic is applied in Q asking minimise the max i.e min(max of all possible ans or distribution etc.) OR
 # maximise the minimum i.e max(min of all possible ans) given some number 'k' or 'm' or both.
 # And when we have to make distribution/parts for consecutive ele (applied in non-consecutive also sometime).
@@ -79,39 +183,3 @@ class Solution:
 # 8) The Painter's Partition Problem-II
 # 9) 1760. Minimum Limit of Balls in a Bag
 
-
-
-
-# tried to find the pages allocated also but not getting correct ans. will do it later.
-class Solution:
-    def findPages(self,A, N, M):
-        if M>N: return -1
-        start, end= max(A), sum(A)
-        pages_allocated= []
-        while start< end:
-            mid= start + (end-start)//2
-            pages_allocated= []
-            # print(pages_allocated,"pages")
-            if self.IsValid(A,N,M,mid, pages_allocated):  # search for even more smaller but mid can be the ans also.
-                end= mid
-            else:
-                start= mid + 1
-        print(pages_allocated)
-        return start
-
-    # this will tell whether allocation is possible for the decided max_page(mid) or not
-    # we will start with one student and start allocating books to them and will count the no of pages in sum for that particular student.
-    def IsValid(self, A, N, M, max_page, pages_allocated):
-        student, sum= 1, 0
-        # try allocating the books to student
-        for i in range(N):
-            sum+= A[i]
-            if sum > max_page: 
-                pages_allocated.append(sum- A[i])
-            # in this case we will increase the no of student and start allocating the books to the new student.
-            # it means the 'sum- A[i]' no of pages is allocated to the current selected student.
-                student+= 1
-                sum= A[i]
-        # and at last we we will compare the no of students with M(# student given in the Q)
-        # if < M means allocation is possible otherwise not possible
-        return False if len(pages_allocated) >= M else True

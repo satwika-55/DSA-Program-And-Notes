@@ -11,6 +11,52 @@ def maxSubArray(self, nums: List[int]) -> int:
             max_sum= max(max_sum,curr_sum)
     return max_sum
 
+# Java Code 
+"""
+class Solution {
+    public int maxSubArray(int[] nums) {
+        int maxSum = Integer.MIN_VALUE;
+        int n = nums.length;
+
+        // finding the sum of all the possible subarrays starting from each index
+        for (int i = 0; i < n; i++) {
+            int currSum = 0;
+            for (int j = i; j < n; j++) {  // this will handle the case of single element also
+                currSum += nums[j];
+                maxSum = Math.max(maxSum, currSum);
+            }
+        }
+
+        return maxSum;
+    }
+}
+"""
+# C++ Code 
+"""
+#include <vector>
+#include <climits>
+#include <algorithm>
+using namespace std;
+
+class Solution {
+public:
+    int maxSubArray(vector<int>& nums) {
+        int maxSum = INT_MIN;
+        int n = nums.size();
+
+        // finding the sum of all the possible subarrays starting from each index
+        for (int i = 0; i < n; ++i) {
+            int currSum = 0;
+            for (int j = i; j < n; ++j) {  // this will handle the case of single element also
+                currSum += nums[j];
+                maxSum = max(maxSum, currSum);
+            }
+        }
+
+        return maxSum;
+    }
+};
+"""
 
 # logic: har ele ke pass 2 choice, either curr_sum me include ho jaye ya khud curr_sum ban jaye. that's it.
 
@@ -43,6 +89,88 @@ class Solution:
             curr_sum= max(curr_sum + n, n)
             max_sum= max(max_sum, curr_sum)
         return max_sum
+# Java Code 
+"""
+class Solution {
+    public int maxSubArray(int[] nums) {
+        int maxSum = nums[0];
+        int currSum = 0;
+
+        for (int n : nums) {
+            // curr_sum is negative then make curr_sum = curr_ele
+            if (currSum < 0) { // adding the 'n' in currSum will decrease the value of currSum so better start currSum from here only.
+                currSum = n;
+            } else { // otherwise add the curr ele to the curr_sum
+                currSum += n;
+            }
+
+            // update the max_sum
+            maxSum = Math.max(maxSum, currSum);
+        }
+
+        return maxSum;
+    }
+}
+// short of above
+
+class Solution {
+    public int maxSubArray(int[] nums) {
+        int maxSum = nums[0];
+        int currSum = 0;
+
+        for (int n : nums) {
+            currSum = Math.max(currSum + n, n);
+            maxSum = Math.max(maxSum, currSum);
+        }
+
+        return maxSum;
+    }
+}
+"""
+# C++ Code 
+"""
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+class Solution {
+public:
+    int maxSubArray(vector<int>& nums) {
+        int maxSum = nums[0];
+        int currSum = 0;
+
+        for (int n : nums) {
+            // curr_sum is negative then make curr_sum = curr_ele
+            if (currSum < 0) { // adding the 'n' in currSum will decrease the value of currSum so better start currSum from here only.
+                currSum = n;
+            } else { // otherwise add the curr ele to the curr_sum
+                currSum += n;
+            }
+
+            // update the max_sum
+            maxSum = max(maxSum, currSum);
+        }
+
+        return maxSum;
+    }
+};
+// short of above
+
+class Solution {
+public:
+    int maxSubArray(vector<int>& nums) {
+        int maxSum = nums[0];
+        int currSum = 0;
+
+        for (int n : nums) {
+            currSum = max(currSum + n, n);
+            maxSum = max(maxSum, currSum);
+        }
+
+        return maxSum;
+    }
+};
+"""
 
 # method 4: By DP
 # exactly same approach as method 2.
@@ -56,6 +184,104 @@ def maxSubArray(self, nums: List[int]) -> int:
             max_sum= max(max_sum, dp[i])
         return max_sum
 
+# Java Code 
+"""
+class Solution {
+    public int maxSubArray(int[] nums) {
+        int n = nums.length;
+        int maxSum = nums[0];
+        int[] dp = new int[n];  // dp[i] will store the max_sum of any subarray till nums[:i]
+        dp[0] = nums[0];
+
+        for (int i = 1; i < n; i++) {
+            dp[i] = nums[i] + (dp[i - 1] > 0 ? dp[i - 1] : 0);
+            maxSum = Math.max(maxSum, dp[i]);
+        }
+
+        return maxSum;
+    }
+}
+"""
+# C++ Code 
+"""
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+class Solution {
+public:
+    int maxSubArray(vector<int>& nums) {
+        int n = nums.size();
+        int maxSum = nums[0];
+        vector<int> dp(n);  // dp[i] will store the max_sum of any subarray till nums[:i]
+        dp[0] = nums[0];
+
+        for (int i = 1; i < n; ++i) {
+            dp[i] = nums[i] + (dp[i - 1] > 0 ? dp[i - 1] : 0);
+            maxSum = max(maxSum, dp[i]);
+        }
+
+        return maxSum;
+    }
+};
+"""
+
+# Method 5:
+"""
+Just for learning purpose even time complexity is high.
+
+The Logic: The Three Possibilities
+When we split an array into two halves, the Maximum Subarray must be in one of three places:
+i) Entirely in the Left half.
+ii) Entirely in the Right half.
+iii) Crossing the midpoint (starting in the left and ending in the right).
+
+Q) If an interviewer asks, "Why would we use this if Kadane's is faster?", the answer is Parallelization.
+Because the left and right halves are independent, you could compute left_sum and right_sum on different machines/processors simultaneously.
+
+Time ; O(n*logn), Merge Sort
+Space Complexity: O(log n) due to the recursive call stack.
+"""
+
+class Solution:
+    def maxSubArray(self, nums: List[int]) -> int:
+        return self.divide_and_conquer(nums, 0, len(nums) - 1)
+
+    def divide_and_conquer(self, nums, left, right):
+        # Base Case: Only one element
+        if left == right:
+            return nums[left]
+        
+        mid = (left + right) // 2
+        
+        # 1. Get max from left half
+        left_sum = self.divide_and_conquer(nums, left, mid)
+        # 2. Get max from right half
+        right_sum = self.divide_and_conquer(nums, mid + 1, right)
+        # 3. Get max that crosses the midpoint
+        cross_sum = self.max_crossing_sum(nums, left, mid, right)
+        
+        # Return the best of the three
+        return max(left_sum, right_sum, cross_sum)
+
+    def max_crossing_sum(self, nums, left, mid, right):
+        # Find max sum starting from mid and moving left
+        sum_left = 0
+        left_max = float('-inf')
+        for i in range(mid, left - 1, -1):
+            sum_left += nums[i]
+            left_max = max(left_max, sum_left)
+            
+        # Find max sum starting from mid+1 and moving right
+        sum_right = 0
+        right_max = float('-inf')
+        for i in range(mid + 1, right + 1):
+            sum_right += nums[i]
+            right_max = max(right_max, sum_right)
+            
+        # The cross sum is the best of the left side + best of the right side
+        return left_max + right_max
+        
 
 # Note: If we want to fidn the "Smallest sum contiguous subarray". (GFG Q)
 # https://practice.geeksforgeeks.org/problems/smallest-sum-contiguous-subarray/1?utm_source=gfg&utm_medium=article&utm_campaign=bottom_sticky_on_article
@@ -86,8 +312,82 @@ class Solution:
             minSum= min(minSum, curSum)
         return minSum
 
+# Java Code 
+"""
+class Solution {
+    public int smallestSumSubarray(int[] A, int N) {
+        int curSum = A[0];
+        int minSum = A[0];
 
-# Try by divide & conquer later
+        for (int i = 1; i < N; i++) {
+            if (curSum > 0) {
+                // we have to decrease 'curSum'
+                curSum = A[i];
+            } else {
+                curSum += A[i];
+            }
+
+            minSum = Math.min(minSum, curSum);
+        }
+
+        return minSum;
+    }
+}
+// shortcut of above
+class Solution {
+    public int smallestSumSubarray(int[] A, int N) {
+        int curSum = A[0];
+        int minSum = A[0];
+
+        for (int i = 1; i < N; i++) {
+            curSum = Math.min(curSum + A[i], A[i]);
+            minSum = Math.min(minSum, curSum);
+        }
+
+        return minSum;
+    }
+}
+"""
+# C++ Code 
+"""
+class Solution {
+public:
+    int smallestSumSubarray(int A[], int N) {
+        int curSum = A[0];
+        int minSum = A[0];
+
+        for (int i = 1; i < N; ++i) {
+            if (curSum > 0) {
+                // we have to decrease 'curSum'
+                curSum = A[i];
+            } else {
+                curSum += A[i];
+            }
+
+            minSum = min(minSum, curSum);
+        }
+
+        return minSum;
+    }
+};
+// shortcut of above
+class Solution {
+public:
+    int smallestSumSubarray(int A[], int N) {
+        int curSum = A[0];
+        int minSum = A[0];
+
+        for (int i = 1; i < N; ++i) {
+            curSum = min(curSum + A[i], A[i]);
+            minSum = min(minSum, curSum);
+        }
+
+        return minSum;
+    }
+};
+"""
+
+
 
 # Follow ups:
 # 1) Print the Maximum Subarray Sum

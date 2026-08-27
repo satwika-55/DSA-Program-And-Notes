@@ -1,3 +1,5 @@
+# method 1: 
+
 """
 logic: Bottom up (can say DP only)
 Logic: For each node check that is root of the ans.
@@ -34,38 +36,69 @@ class Solution:
         dfs(root)
         return self.ans
 
-# Java
+# Java Code 
 """
-// Not able to writ ein exact same format
+class TreeNode {
+    int val;
+    TreeNode left, right;
+    TreeNode(int x) { val = x; }
+}
 
-// other way of writing above code
-public class Solution {
-    int maxSum = Integer.MIN_VALUE;
+class Solution {
+    int ans = Integer.MIN_VALUE;
 
     public int maxPathSum(TreeNode root) {
-        if (root == null)
-            return 0;
-
         dfs(root);
-        return maxSum;
+        return ans;
     }
 
     private int dfs(TreeNode root) {
-        if (root == null)
-            return 0;
+        // return the lowest possible value in base case so that it doesn't affect the ans. 
+        // returning '0' will affect if node values will be "-ve" because then max will be '0' and we will get the wrong ans.
+        if (root == null) return Integer.MIN_VALUE;
 
-        int leftSum = Math.max(0, dfs(root.left)); // Max sum in the left subtree
-        int rightSum = Math.max(0, dfs(root.right)); // Max sum in the right subtree
+        int l = dfs(root.left);
+        int r = dfs(root.right);
 
-        // Calculate the maximum path sum passing through the current node
-        int currentSum = leftSum + rightSum + root.val;
+        ans = Math.max(ans, Math.max(Math.max(l + root.val, r + root.val),
+                                     Math.max(l + r + root.val, root.val)));
 
-        // Update the maximum path sum found so far
-        maxSum = Math.max(maxSum, currentSum);
-
-        // Return the maximum sum of the path from the current node to its parent
-        return Math.max(leftSum, rightSum) + root.val;
+        return Math.max(Math.max(l + root.val, r + root.val), root.val);
     }
 }
+"""
+# C++ Code 
+"""
+#include <climits>
+#include <algorithm>
+using namespace std;
 
+struct TreeNode {
+    int val;
+    TreeNode* left;
+    TreeNode* right;
+    TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+};
+
+class Solution {
+public:
+    int ans = INT_MIN;
+
+    int maxPathSum(TreeNode* root) {
+        dfs(root);
+        return ans;
+    }
+
+    int dfs(TreeNode* root) {
+        // return the lowest possible value in base case so that it doesn't affect the ans. 
+        // returning '0' will affect if node values will be "-ve" because then max will be '0' and we will get the wrong ans.
+        if (!root) return INT_MIN;
+
+        int l = dfs(root->left);
+        int r = dfs(root->right);
+
+        ans = max({ans, l + root->val, r + root->val, l + r + root->val, root->val});
+        return max({l + root->val, r + root->val, root->val});
+    }
+};
 """

@@ -13,7 +13,11 @@
 
 # Time : O(n*logn)
 
-# submitted on Gfg.
+"""
+Note vvvi: Jahan bhi count karna ho like: find no of elements on left/right greater than cur ele etc.. then try to think of merge sort.
+Only need to modify merge function according to given question.
+"""
+
 class Solution:  
     def inversionCount(self, arr, n):
         return self.merge_sort_count_inversion(arr, 0, n-1)
@@ -46,25 +50,116 @@ class Solution:
         while(low2<=up2):
             b.append(arr[low2])
             low2+=1
-        j= low
-        k= 0
-        while(j<=up):
-            arr[j]= b[k]
-            j+= 1
-            k+= 1
+        # j= low
+        # k= 0
+        # while(j<=up):
+        #     arr[j]= b[k]
+        #     j+= 1
+        #     k+= 1
+        arr[low:up+1] = b  # shortcut to modify 'a' again with 'b'
         return inv_count
 
+# Java Code 
+"""
+class Solution {
+    public int inversionCount(int[] arr, int n) {
+        return mergeSortCountInversion(arr, 0, n - 1);
+    }
 
-# Note vvvi: Jahan bhi count karna ho like: find no of elements on left/right greater than cur ele etc.. then try to think of merge sort.
-# Only need to modify merge function according to Q.
+    private int mergeSortCountInversion(int[] arr, int low, int up) {
+        int invCount = 0;
+        if (low < up) {  // to check if there is more than one element.
+            int mid = low + (up - low) / 2;
+            invCount += mergeSortCountInversion(arr, low, mid);
+            invCount += mergeSortCountInversion(arr, mid + 1, up);
+            invCount += merge(arr, low, mid, up);
+        }
+        return invCount;
+    }
 
-# Related Q: 
-# 1) "493. Reverse Pairs", 
-# 2) "315. Count of Smaller Numbers After Self"
+    // left part should be smaller and if it doesn't, there are inversions.
+    private int merge(int[] arr, int low, int mid, int up) {
+        int low1 = low, up1 = mid, low2 = mid + 1, up2 = up;
+        int invCount = 0;
+        int[] b = new int[up - low + 1];
+        int index = 0;
 
+        while (low1 <= up1 && low2 <= up2) {
+            if (arr[low1] <= arr[low2]) {
+                b[index++] = arr[low1++];
+            } else {  // all ele from low1 to up1 will be greater so count = up1 - low1 + 1
+                invCount += up1 - low1 + 1;  // being counted for each ele on left side.
+                b[index++] = arr[low2++];
+            }
+        }
 
-# Note: Study this article properly to get logic of different algo that will help in solving these types of Q.
-# https://leetcode.com/problems/reverse-pairs/solutions/97268/general-principles-behind-problems-similar-to-reverse-pairs/
+        while (low1 <= up1) {
+            b[index++] = arr[low1++];
+        }
 
+        while (low2 <= up2) {
+            b[index++] = arr[low2++];
+        }
 
-# Also try by BST and Segment tree logic.
+        for (int i = 0; i < b.length; i++) {
+            arr[low + i] = b[i];
+        }
+
+        return invCount;
+    }
+}
+"""
+# C++ Code 
+"""
+#include <vector>
+using namespace std;
+
+class Solution {
+public:
+    int inversionCount(vector<int>& arr, int n) {
+        return mergeSortCountInversion(arr, 0, n - 1);
+    }
+
+private:
+    int mergeSortCountInversion(vector<int>& arr, int low, int up) {
+        int invCount = 0;
+        if (low < up) {  // to check if there is more than one element.
+            int mid = low + (up - low) / 2;
+            invCount += mergeSortCountInversion(arr, low, mid);
+            invCount += mergeSortCountInversion(arr, mid + 1, up);
+            invCount += merge(arr, low, mid, up);
+        }
+        return invCount;
+    }
+
+    // left part should be smaller and if it doesn't, there are inversions.
+    int merge(vector<int>& arr, int low, int mid, int up) {
+        int low1 = low, up1 = mid, low2 = mid + 1, up2 = up;
+        int invCount = 0;
+        vector<int> b;
+
+        while (low1 <= up1 && low2 <= up2) {
+            if (arr[low1] <= arr[low2]) {
+                b.push_back(arr[low1++]);
+            } else {  // all ele from low1 to up1 will be greater so count = up1 - low1 + 1
+                invCount += up1 - low1 + 1;  // being counted for each ele on left side.
+                b.push_back(arr[low2++]);
+            }
+        }
+
+        while (low1 <= up1) {
+            b.push_back(arr[low1++]);
+        }
+
+        while (low2 <= up2) {
+            b.push_back(arr[low2++]);
+        }
+
+        for (int i = 0; i < b.size(); i++) {
+            arr[low + i] = b[i];
+        }
+
+        return invCount;
+    }
+};
+"""

@@ -1,3 +1,5 @@
+# Method 1: 
+
 # very nice Q.
 # logic: overall, there are totally 4 scenarios will happen: 1.(+,+) 2.(-,-) 3.(+,-) 4.(-,+)  => see this combination as resultant also 
 # But collision will hapen in 3rd case only.(not even in 4th case)
@@ -41,6 +43,85 @@ class Solution:
                     stack.pop()
         return stack
 
-# Similar / extended Q
-# 1) 2751. Robot Collisions
+# Java Code 
+"""
+import java.util.*;
+
+public class Solution {
+    public int[] asteroidCollision(int[] asteroids) {
+        Stack<Integer> stack = new Stack<>();
+        for (int num : asteroids) {
+            if (num > 0) {
+                stack.push(num);
+            } else {
+                // keep on popping as the curr one will cancel the stack top.
+                while (!stack.isEmpty() && stack.peek() > 0 && stack.peek() < Math.abs(num)) {
+                    stack.pop();
+                }
+                // stack can be empty only or have become empty after popping(curr -ve have cancel all ball due to high magnitude) or
+                // stack top is of same sign i.e -ve only, so append in stack
+                if (stack.isEmpty() || stack.peek() < 0) {
+                    stack.push(num);
+                }
+                // if magnitude of both equal then both will get cancelled, so pop from stack.
+                else if (stack.peek() == Math.abs(num)) {
+                    stack.pop();
+                }
+            }
+        }
+
+        // Convert stack to array
+        int[] result = new int[stack.size()];
+        for (int i = stack.size() - 1; i >= 0; i--) {
+            result[i] = stack.pop();
+        }
+        return result;
+    }
+}
+
+"""
+
+# C++ Code 
+"""
+#include <vector>
+#include <stack>
+#include <cmath>
+using namespace std;
+
+class Solution {
+public:
+    vector<int> asteroidCollision(vector<int>& asteroids) {
+        stack<int> st;
+        for (int num : asteroids) {
+            if (num > 0) {
+                st.push(num);
+            } else {
+                // keep on popping as the curr one will cancel the stack top.
+                while (!st.empty() && st.top() > 0 && st.top() < abs(num)) {
+                    st.pop();
+                }
+                // stack can be empty only or have become empty after popping(curr -ve have cancel all ball due to high magnitude) or
+                // stack top is of same sign i.e -ve only, so append in stack
+                if (st.empty() || st.top() < 0) {
+                    st.push(num);
+                }
+                // if magnitude of both equal then both will get cancelled, so pop from stack.
+                else if (st.top() == abs(num)) {
+                    st.pop();
+                }
+            }
+        }
+
+        // Convert stack to vector in correct order
+        vector<int> result(st.size());
+        for (int i = st.size() - 1; i >= 0; --i) {
+            result[i] = st.top();
+            st.pop();
+        }
+        return result;
+    }
+};
+
+"""
+
 

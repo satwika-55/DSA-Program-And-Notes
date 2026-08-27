@@ -1,4 +1,6 @@
-# logic:Similar logic like "Allocate minimum no of pages" but very good Q.
+# method 1: 
+
+# logic: Similar logic like "Allocate minimum no of pages" but very good Q.
 # Q asking : 'k' gas station add karne ke bad minimum distance kisi bhi gas station ke beech kitna ho sakta h.
 
 # we can check for each posible ans(difference only) like if it is possible to keep all the stations with this 'diff' 
@@ -12,9 +14,9 @@
 
 # Raeson: Every adjacent gas staion can have max distance 'mid', so checking between every station.
 
-
-# submitted on lintcode(LC premium).
 # time: O(n* log(max(stations)))
+
+
 class Solution:
     def minmax_gas_dist(self, stations: List[int], k: int) -> float:
 
@@ -34,3 +36,67 @@ class Solution:
             else:
                 start= mid + delta
         return start
+
+# Java Code 
+"""
+class Solution {
+    public double minmaxGasDist(int[] stations, int k) {
+        double delta = 1e-6;  // mini diff can be this. Also given ans must be within this only.
+        double start = 0;  // nearly equal to '0'.
+        double end = stations[stations.length - 1];  // max difference can be this at start
+
+        while (end - start > delta) {
+            double mid = start + (end - start) / 2;
+            if (isPossible(stations, k, mid)) {
+                end = mid;
+            } else {
+                start = mid + delta;
+            }
+        }
+        return start;
+    }
+
+    private boolean isPossible(int[] stations, int k, double diff) {
+        // kisi 2 station ka beech ka min distance 'd' chahiye to kya hm 'k' additional gas station add karke kar sakte h?
+        int count = 0;
+        for (int i = 1; i < stations.length; i++) {
+            count += (int)((stations[i] - stations[i - 1]) / diff);  
+            // no of additional gas station required between these two to take the min diff <= 'diff'.
+        }
+        return count <= k;  // means it is possible to keep all the adjacent stations with max diff = diff by putting additional 'k' stations.
+    }
+}
+"""
+
+# C++ Code 
+"""
+class Solution {
+public:
+    double minmaxGasDist(vector<int>& stations, int k) {
+        double delta = 1e-6;  // mini diff can be this. Also given ans must be within this only.
+        double start = 0;  // nearly equal to '0'.
+        double end = stations.back();  // max difference can be this at start
+
+        while (end - start > delta) {
+            double mid = start + (end - start) / 2;
+            if (isPossible(stations, k, mid)) {
+                end = mid;
+            } else {
+                start = mid + delta;
+            }
+        }
+        return start;
+    }
+
+private:
+    bool isPossible(const vector<int>& stations, int k, double diff) {
+        // kisi 2 station ka beech ka min distance 'd' chahiye to kya hm 'k' additional gas station add karke kar sakte h?
+        int count = 0;
+        for (size_t i = 1; i < stations.size(); ++i) {
+            count += static_cast<int>((stations[i] - stations[i - 1]) / diff);
+            // no of additional gas station required between these two to take the min diff <= 'diff'.
+        }
+        return count <= k;  // means it is possible to keep all the adjacent stations with max diff = diff by putting additional 'k' stations.
+    }
+};
+"""

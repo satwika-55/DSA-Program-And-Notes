@@ -18,9 +18,65 @@ class Solution:
         # so make temp.next= None
         temp.next= None
         return head
+"""
+# Java
+class Solution {
+    public ListNode reverseList(ListNode head) {
+        if (head == null) return head;
+        Stack<ListNode> stack = new Stack<>();
+        ListNode curr = head;
+        while (curr != null) {
+            stack.push(curr);
+            curr = curr.next;
+        }
+        head = stack.pop();
+        ListNode temp = head;
+        while (!stack.isEmpty()) {
+            temp.next = stack.pop();
+            temp = temp.next;
+        }
+        temp.next = null;
+        return head;
+    }
+}
 
+# C++
+class Solution {
+public:
+    ListNode* reverseList(ListNode* head) {
+        if (head == nullptr) return head;
+        stack<ListNode*> stk;
+        ListNode* curr = head;
+        while (curr != nullptr) {
+            stk.push(curr);
+            curr = curr->next;
+        }
+        head = stk.top();
+        stk.pop();
+        ListNode* temp = head;
+        while (!stk.empty()) {
+            temp->next = stk.top();
+            stk.pop();
+            temp = temp->next;
+        }
+        temp->next = nullptr;
+        return head;
+    }
+};
 
-# method 2: Iterative(submitted on leetcode)
+Method 1 Analysis:
+# Time Complexity: O(N) — traverse the list once
+# Space Complexity: O(N) — stack holds all nodes
+"""
+
+# method 2: Iterative
+"""
+method 2: We'll reverse the list by changing the links directly
+Start with two pointers: one for the previous node (pre = None) and one for the current node (curr = head)
+As we move traverse the list, we keep flipping the pointers so that each node points to the one before it
+Keep doing this till we reach the end of the list
+In the end, pre will be pointing to the new head
+"""
 # time: o(n), space: o(1)
 class Solution:
     def reverseList(self, head: Optional[ListNode]) -> Optional[ListNode]:
@@ -35,12 +91,83 @@ class Solution:
             current= temp     # move current one step forward 
         return pre              # at last pre will point to the 1st node in reverse list
                                 # and current and first will point to None
+"""
+class ListNode {
+    int val;
+    ListNode next;
+    ListNode(int val) { this.val = val; }
+}
+
+class Solution {
+    public ListNode reverseList(ListNode head) {
+        if (head == null) return head;
+        // current will point one step ahead of pre,
+        // what ever node we will pass in function, it will reverse all node from that node till end
+        ListNode pre = null, current = head;
+        while (current != null) {  // if you will write 'while curr.next' it will not reverse the last node
+            ListNode temp = current.next;  // you need to store current.next somewhere so that after reversing current ele , current point to his next to reverse that also
+            current.next = pre;            // change the direction of current ele i.e point to the ele before it
+            pre = current;                 // we have to store current somewhere so that next time reversed ele point to this or "pre must point to one position before curr"
+            current = temp;                // move current one step forward 
+        }
+        return pre;                        // at last pre will point to the 1st node in reverse list
+                                          // and current and first will point to None
+    }
+}
+
+
+struct ListNode {
+    int val;
+    ListNode* next;
+    ListNode(int x) : val(x), next(nullptr) {}
+};
+
+class Solution {
+public:
+    ListNode* reverseList(ListNode* head) {
+        if (!head) return head;
+        // current will point one step ahead of pre,
+        // what ever node we will pass in function, it will reverse all node from that node till end
+        ListNode* pre = nullptr;
+        ListNode* current = head;
+        while (current) {  // if you will write 'while curr.next' it will not reverse the last node
+            ListNode* temp = current->next;  // you need to store current.next somewhere so that after reversing current ele , current point to his next to reverse that also
+            current->next = pre;             // change the direction of current ele i.e point to the ele before it
+            pre = current;                   // we have to store current somewhere so that next time reversed ele point to this or "pre must point to one position before curr"
+            current = temp;                  // move current one step forward 
+        }
+        return pre;                          // at last pre will point to the 1st node in reverse list
+                                             // and current and first will point to None
+    }
+};
+
+
+Method 2 Analysis:
+# Time Complexity: O(N) — traverse the list once
+# Space Complexity: O(1) — only a few pointers used
+"""
 
 # Method 3: Iterative
-# Do on pen and paper and understand.
-# Understand this later properly.
-    
-# This method we can use in "92. Reverse Linked List II"  for concise code.
+"""
+Create a dummy node before the head to make handling edge cases easier
+We'll use three pointers:
+  pre - the node right before the part we're reversing
+  start - the first node in the part we're currently reversing
+  then - the next node that needs to be moved to the front of the reversed section
+Keep doing this until we've moved all nodes to the front
+At the end, dummy.next will point to the new head of the reversed list
+
+Do on pen and paper and understand.
+This method we can use in "92. Reverse Linked List II"  for concise code.
+
+Time Complexity: O(N) — traverse the list once
+Space Complexity: O(1) — only a few pointers used
+
+Q) How it is different from Method 2?
+-> In above method we are just reversing the direction when we see the current element, but in this
+we are bring the next element at front of all the reversed node till now .
+"""
+
 
 class Solution:
     def reverseList(self, head: Optional[ListNode]) -> Optional[ListNode]:
@@ -69,14 +196,111 @@ class Solution:
         # second reversing: dummy->3 - 2 - 1 - 4 - 5;   pre = dummy, start = 1, then = 4    , 1st three node got reversed
         # third reversing:  dummy->4- 3 - 2 - 1 - 5;    pre = dummy, start = 1, then = 5   , 1st four node got reversed
         # fourth reversing: dummy->5- 4- 3 - 2 - 1;    pre = dummy, start = 1, then = None (finish)  , all nodes got reversed
-        return dummy.next
+        return dummy.next  # return pre.next
+"""
+class ListNode {
+    int val;
+    ListNode next;
+    ListNode(int val) { this.val = val; }
+}
 
-# Method 3: By recursion
+class Solution {
+    public ListNode reverseList(ListNode head) {
+        if (head == null) return head;
+
+        ListNode dummy = new ListNode(0);  // will help to handle the case when we will reverse from head also
+        dummy.next = head;
+        ListNode pre = dummy;
+        ListNode start = head;   // starting node from which we have to reverse
+        // Note: We won't change 'pre' and 'start' pointer. Will only change its 'next'.
+        ListNode then = start.next;  // node from which we will change the direction
+
+        // 1 - 2 - 3 - 4 - 5 ; ---> pre = dummy, start = 1, then = 2
+        // dummy -> 1 -> 2 -> 3 -> 4 -> 5
+
+        // 'pre.next'     will always point to the 1st node that we got after reversing till now.
+        // 'start.next' : will point the node from which we have to reverse in next iteration
+
+        ListNode cur = head;
+        // We are changing direction one step ahead of 'cur' so need to check 'cur.next' only not 'while cur != null'
+        while (cur.next != null) {
+            start.next = then.next;
+            then.next = pre.next;
+            pre.next = then;
+            then = start.next;  // will point the node from which we have to reverse in next iteration
+        }
+        // first reversing : dummy->2 - 1 - 3 - 4 - 5;   pre = dummy, start = 1, then = 3  , 1st two node got reversed
+        // second reversing: dummy->3 - 2 - 1 - 4 - 5;   pre = dummy, start = 1, then = 4    , 1st three node got reversed
+        // third reversing:  dummy->4- 3 - 2 - 1 - 5;    pre = dummy, start = 1, then = 5   , 1st four node got reversed
+        // fourth reversing: dummy->5- 4- 3 - 2 - 1;    pre = dummy, start = 1, then = null (finish)  , all nodes got reversed
+
+        return dummy.next;
+    }
+}
+
+
+struct ListNode {
+    int val;
+    ListNode* next;
+    ListNode(int x) : val(x), next(nullptr) {}
+};
+
+class Solution {
+public:
+    ListNode* reverseList(ListNode* head) {
+        if (head == nullptr) return head;
+
+        ListNode* dummy = new ListNode(0);  // will help to handle the case when we will reverse from head also
+        dummy->next = head;
+        ListNode* pre = dummy;
+        ListNode* start = head;   // starting node from which we have to reverse
+        // Note: We won't change 'pre' and 'start' pointer. Will only change its 'next'.
+        ListNode* then = start->next;  // node from which we will change the direction
+
+        // 1 - 2 - 3 - 4 - 5 ; ---> pre = dummy, start = 1, then = 2
+        // dummy -> 1 -> 2 -> 3 -> 4 -> 5
+
+        // 'pre->next'     will always point to the 1st node that we got after reversing till now.
+        // 'start->next' : will point the node from which we have to reverse in next iteration
+
+        ListNode* cur = head;
+        // We are changing direction one step ahead of 'cur' so need to check 'cur->next' only not 'while cur != nullptr'
+        while (cur->next != nullptr) {
+            start->next = then->next;
+            then->next = pre->next;
+            pre->next = then;
+            then = start->next;  // will point the node from which we have to reverse in next iteration
+        }
+        // first reversing : dummy->2 - 1 - 3 - 4 - 5;   pre = dummy, start = 1, then = 3  , 1st two node got reversed
+        // second reversing: dummy->3 - 2 - 1 - 4 - 5;   pre = dummy, start = 1, then = 4    , 1st three node got reversed
+        // third reversing:  dummy->4- 3 - 2 - 1 - 5;    pre = dummy, start = 1, then = 5   , 1st four node got reversed
+        // fourth reversing: dummy->5- 4- 3 - 2 - 1;    pre = dummy, start = 1, then = nullptr (finish)  , all nodes got reversed
+
+        return dummy->next;
+    }
+};
+
+
+
+
+# Method 4: By recursion
 # just the conversion of above iterative into recursive.
+"""
+Use recursion to reverse the list starting from the head
+Keep track of two pointers:
+  pre - the part we've already reversed
+  current - the part we still need to process
+Recursively call the function, moving forward until current reaches the end
+Then, as the calls return, flip the pointers so current.next points back to pre
+In the end, return the new head once everything's reversed
+"""
+"""
+Analysis:
+# Time Complexity: O(N) — each node visited once
+# Space Complexity: O(N) — recursive call stack
+"""
 
 # Bottom up(like we do in Tree till we reach the leaf node or 'None' ).
-
-# time: O(n), space: O(n)
 
 class Solution:
     def reverseList(self, head: Optional[ListNode]) -> Optional[ListNode]: 
@@ -96,6 +320,72 @@ class Solution:
                 # pre.next= None # no need of this as while traversing back link will get broken automatically 
             return self.head
 
+"""
+class ListNode {
+    int val;
+    ListNode next;
+    ListNode(int val) { this.val = val; }
+}
+
+class Solution {
+    private ListNode head;  // used to store the new head (last node after reversal)
+
+    public ListNode reverseList(ListNode head) {
+        ListNode pre = null, curr = head;
+        return reverseByRecursion(pre, curr);  // whatever you will pass as current, from current it will reverse till last
+    }
+
+    // at last current will point to null and
+    // pre will point to last node
+    // so make head point to pre
+    // now it will start reversing the pointer like: current.next = pre
+    // will execute in backward direction till first call
+    private ListNode reverseByRecursion(ListNode pre, ListNode current) {
+        if (current == null) {
+            this.head = pre;  // now we have to change the direction so make head point to pre as pre will be pointing to the last ele
+        } else {
+            reverseByRecursion(current, current.next);  // this is breaking into small subproblem
+            current.next = pre;
+            // pre.next = null; // no need of this as while traversing back link will get broken automatically
+        }
+        return this.head;
+    }
+}
+
+struct ListNode {
+    int val;
+    ListNode* next;
+    ListNode(int x) : val(x), next(nullptr) {}
+};
+
+class Solution {
+private:
+    ListNode* head;  // used to store the new head (last node after reversal)
+
+public:
+    ListNode* reverseList(ListNode* head) {
+        ListNode* pre = nullptr;
+        ListNode* curr = head;
+        return reverseByRecursion(pre, curr);  // whatever you will pass as current, from current it will reverse till last
+    }
+
+    // at last current will point to nullptr and
+    // pre will point to last node
+    // so make head point to pre
+    // now it will start reversing the pointer like: current->next = pre
+    // will execute in backward direction till first call
+    ListNode* reverseByRecursion(ListNode* pre, ListNode* current) {
+        if (current == nullptr) {
+            this->head = pre;  // now we have to change the direction so make head point to pre as pre will be pointing to the last ele
+        } else {
+            reverseByRecursion(current, current->next);  // this is breaking into small subproblem
+            current->next = pre;
+            // pre->next = nullptr; // no need of this as while traversing back link will get broken automatically
+        }
+        return this->head;
+    }
+};
+
 
 # another way of writing the above code
 class Solution:
@@ -114,29 +404,17 @@ class Solution:
         return headreverse  # at last return head reverse
 
 
-# method 4: using only one parameter
-# Logic: After reaching base case 'that last node' should be head for reverse order.
-# That reverse node should not change.
-# Only change the pointer to reverse the direction and return the same 'reverseNode' always like above recursive methods.
-class Solution:
-    def reverseList(self, head: Optional[ListNode]) -> Optional[ListNode]:
-        if not head or not head.next:  # if there is no node or only one node. start reversing after you reach the last node
-            return head
-        reverseHead= self.reverseList(head.next)
-        head.next.next= head  # reversing the link between next node and head.
-        head.next= None  # this we have to write for the 1st node. other next will automatically become None
-        return reverseHead
+# method 5:
+"""
+Recursion using only one parameter
+Logic: After reaching base case 'that last node' should be head for reverse order.
+That reverse node should not change.
+Only change the pointer to reverse the direction and return the same 'reverseNode' always like above recursive methods.
 
-
-# Note vvi: Whenever you have comapare 1st and last ele , 
-# do sum of 1st and last ele, append 1st to last ele , or any operation related to 1st and last ele.
-# Must think of 'reversing linklist' and how we can get ans from reversing.
-
-# Questions based on this:
-# 234. Palindrome Linked List
-# 61. Rotate List
-# 2130. Maximum Twin Sum of a Linked List
-# 143. Reorder List
+Note vvi: Whenever you have comapare 1st and last ele , 
+do sum of 1st and last ele, append 1st to last ele , or any operation related to 1st and last ele.
+Must think of 'reversing linklist' and how we can get ans from reversing.
+"""
 
 # mistakes
 # i got my mistake: for using a variable defined in other function, just put both the function inside a class and 
@@ -182,68 +460,52 @@ class Solution:
             curr.next= pre
         return curr   
 
+# Corrected code
 
-
-# Template for using in other questions:
-def reverseList(self, head) :
-        if not head: return head 
-        pre,current= None,head 
-        while current:  
-            temp= current.next  
-            current.next= pre    
-            pre= current        
-            current= temp     
-        return pre              
-
-
-# java
+class Solution:
+    def reverseList(self, head: Optional[ListNode]) -> Optional[ListNode]:
+        if not head or not head.next:  # if there is no node or only one node. start reversing after you reach the last node
+            return head
+        reverseHead= self.reverseList(head.next)
+        head.next.next= head  # reversing the link between next node and head.
+        head.next= None  # this we have to write for the 1st node. other next will automatically become None
+        return reverseHead
 """
-// method 2:
-class Solution {
-    public ListNode reverseList(ListNode head) {
-        if (head == null) return head;
-        ListNode pre = null, current = head;
-        while (current != null) {
-            ListNode temp = current.next;
-            current.next = pre;
-            pre = current;
-            current = temp;
-        }
-        return pre;
-    }
+# Java
+class ListNode {
+    int val;
+    ListNode next;
+    ListNode(int val) { this.val = val; }
 }
 
-// method 3:
-class Solution {
-    private ListNode head;
-    public ListNode reverseList(ListNode head) {
-        this.head = head;
-        ListNode pre = null, curr = head;
-        return reverseByRecursion(pre, curr);
-    }
-
-    private ListNode reverseByRecursion(ListNode pre, ListNode curr) {
-        if (curr == null) {
-            this.head = pre;
-        } else {
-            reverseByRecursion(curr, curr.next);
-            curr.next = pre;
-        }
-        return this.head;
-    }
-    }
-
-// method 4:
 class Solution {
     public ListNode reverseList(ListNode head) {
-        if (head == null || head.next == null) {
+        if (head == null || head.next == null) {  // if there is no node or only one node. start reversing after you reach the last node
             return head;
         }
         ListNode reverseHead = reverseList(head.next);
-        head.next.next = head;
-        head.next = null;
+        head.next.next = head;  // reversing the link between next node and head.
+        head.next = null;       // this we have to write for the 1st node. other next will automatically become null
         return reverseHead;
     }
 }
 
-"""
+# C++ 
+struct ListNode {
+    int val;
+    ListNode* next;
+    ListNode(int x) : val(x), next(nullptr) {}
+};
+
+class Solution {
+public:
+    ListNode* reverseList(ListNode* head) {
+        if (head == nullptr || head->next == nullptr) {  // if there is no node or only one node. start reversing after you reach the last node
+            return head;
+        }
+        ListNode* reverseHead = reverseList(head->next);
+        head->next->next = head;  // reversing the link between next node and head.
+        head->next = nullptr;     // this we have to write for the 1st node. other next will automatically become null
+        return reverseHead;
+    }
+};

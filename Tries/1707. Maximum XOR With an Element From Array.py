@@ -1,3 +1,5 @@
+# Method 1: 
+
 # logic: for each query(xi, mi) we have to insert the num only having value <= mi. Since we have to take with num <= mi for each query.
 # for this to check sort both the 'nums' and queries.
 
@@ -55,12 +57,12 @@ class Solution:
             ans[i]= trie.getAns(xi)
         return ans
 
-# java
+# Java Code 
 """
 import java.util.*;
 
 class TrieNode {
-    Map<Integer, TrieNode> children = new HashMap<>();
+    Map<Integer, TrieNode> children = new HashMap<>();  // will contain bits 0 and 1
 }
 
 class Trie {
@@ -69,60 +71,142 @@ class Trie {
     public void insert(int num) {
         TrieNode cur = root;
         for (int i = 31; i >= 0; i--) {
-            int bit = (num >> i) & 1;
+            int bit = (num >> i) & 1;  // will give the 'ith' bit
             cur.children.putIfAbsent(bit, new TrieNode());
             cur = cur.children.get(bit);
         }
     }
 
-    public int getMaxXor(int num) {
-        if (root.children.isEmpty()) return -1;
+    public int getAns(int num) {
+        if (root.children.isEmpty())  // means all elements are larger than 'mi'
+            return -1;
 
+        int max_xor = 0;
         TrieNode cur = root;
-        int maxXor = 0;
+
         for (int i = 31; i >= 0; i--) {
-            int bit = (num >> i) & 1;
-            int toggledBit = 1 - bit;
-            if (cur.children.containsKey(toggledBit)) {
-                maxXor |= (1 << i);
-                cur = cur.children.get(toggledBit);
+            int bit = (num >> i) & 1;  // getting the bit at 'i'th position
+            // for maximum xor, we need the opposite of this 'bit'
+            if (cur.children.containsKey(1 - bit)) {
+                max_xor |= (1 << i);  // bring '1' at ith position in ans keeping all other bit same
+                cur = cur.children.get(1 - bit);
             } else {
-                cur = cur.children.getOrDefault(bit, null);
+                cur = cur.children.get(bit);
             }
         }
-        return maxXor;
+        return max_xor;
     }
 }
 
 class Solution {
     public int[] maximizeXor(int[] nums, int[][] queries) {
-        Arrays.sort(nums);
-        int n = queries.length;
-        int[] result = new int[n];
+        Arrays.sort(nums);  // to insert values less than equal to 'mi' for each query
 
-        // Create a combined list with index
-        int[][] extendedQueries = new int[n][3];
-        for (int i = 0; i < n; i++) {
-            extendedQueries[i][0] = queries[i][0]; // xi
-            extendedQueries[i][1] = queries[i][1]; // mi
-            extendedQueries[i][2] = i;             // original index
+        int[][] sortedQueries = new int[queries.length][3];
+        for (int i = 0; i < queries.length; i++) {
+            sortedQueries[i][0] = queries[i][0];  // xi
+            sortedQueries[i][1] = queries[i][1];  // mi
+            sortedQueries[i][2] = i;              // original index
         }
 
-        Arrays.sort(extendedQueries, Comparator.comparingInt(a -> a[1]));  // sort by mi
+        Arrays.sort(sortedQueries, Comparator.comparingInt(a -> a[1]));  // sort based on 'mi'
 
         Trie trie = new Trie();
-        int index = 0;
-        for (int[] query : extendedQueries) {
-            int xi = query[0], mi = query[1], originalIdx = query[2];
+        int[] ans = new int[queries.length];
+        int j = 0;
 
-            while (index < nums.length && nums[index] <= mi) {
-                trie.insert(nums[index]);
-                index++;
+        // Now for each query insert the ele from the nums which are smaller than mi
+        for (int[] q : sortedQueries) {
+            int xi = q[0], mi = q[1], idx = q[2];
+            while (j < nums.length && nums[j] <= mi) {
+                trie.insert(nums[j]);
+                j++;
             }
-            result[originalIdx] = trie.getMaxXor(xi);
+            ans[idx] = trie.getAns(xi);
         }
 
-        return result;
+        return ans;
     }
 }
+"""
+# C++ Code 
+"""
+#include <iostream>
+#include <vector>
+#include <unordered_map>
+#include <algorithm>
+using namespace std;
+
+class TrieNode {
+public:
+    unordered_map<int, TrieNode*> children;  // will contain bits 0 and 1
+};
+
+class Trie {
+    TrieNode* root;
+
+public:
+    Trie() {
+        root = new TrieNode();
+    }
+
+    void insert(int num) {
+        TrieNode* cur = root;
+        for (int i = 31; i >= 0; --i) {
+            int bit = (num >> i) & 1;  // will give the 'ith' bit
+            if (!cur->children.count(bit)) {
+                cur->children[bit] = new TrieNode();
+            }
+            cur = cur->children[bit];
+        }
+    }
+
+    int getAns(int num) {
+        if (root->children.empty()) return -1;  // means all elements are larger than 'mi'
+
+        TrieNode* cur = root;
+        int max_xor = 0;
+        for (int i = 31; i >= 0; --i) {
+            int bit = (num >> i) & 1;  // getting the bit at 'i'th position
+            // for maximum xor, we need the opposite of this 'bit'
+            if (cur->children.count(1 - bit)) {
+                max_xor |= (1 << i);  // bring '1' at ith position in ans keeping all other bit same
+                cur = cur->children[1 - bit];
+            } else {
+                cur = cur->children[bit];
+            }
+        }
+        return max_xor;
+    }
+};
+
+class Solution {
+public:
+    vector<int> maximizeXor(vector<int>& nums, vector<vector<int>>& queries) {
+        sort(nums.begin(), nums.end());  // to insert values less than equal to 'mi' for each query
+
+        vector<tuple<int, int, int>> sortedQueries;
+        for (int i = 0; i < queries.size(); ++i) {
+            sortedQueries.emplace_back(queries[i][0], queries[i][1], i);  // xi, mi, index
+        }
+
+        sort(sortedQueries.begin(), sortedQueries.end(),
+             [](const auto& a, const auto& b) { return get<1>(a) < get<1>(b); });  // sort based on 'mi'
+
+        Trie trie;
+        vector<int> ans(queries.size(), -1);
+        int j = 0;
+
+        // Now for each query insert the ele from the nums which are smaller than mi
+        for (const auto& [xi, mi, idx] : sortedQueries) {
+            while (j < nums.size() && nums[j] <= mi) {
+                trie.insert(nums[j]);
+                ++j;
+            }
+            ans[idx] = trie.getAns(xi);
+        }
+
+        return ans;
+    }
+};
 """

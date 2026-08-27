@@ -1,5 +1,7 @@
+# Basic: 
+
 """
-Note: in Binary search mid will give the ans always. so for making any decision or condition in 'if' or 'while' loop, 
+Note latest: in Binary search mid will give the ans always. so for making any decision or condition in 'if' or 'while' loop, 
 just think from 'mid' i.e if it is not equal to mid then where to move for this 'if' condition.
 
 Note: for initialising 'low' and 'up' just find the range in which we can get the ans.
@@ -253,5 +255,264 @@ Note Latest: Template1, template4, Template5 is enough to solve all the question
 So replace answers of all questions slowly slowly using these three templates only.
 """
 
-# Other questions that need exact this binary search logic: 
-# 1) 34. Find First and Last Position of Element in Sorted Array
+# Java Templates 
+"""
+//template 1
+int binary_search(int[] arr, int key) {
+    int n = arr.length;
+    int low = 0, up = n - 1;
+    while (low <= up) {
+        int mid = low + (up - low) / 2;
+        if (arr[mid] == key)
+            return mid;
+        else if (arr[mid] > key)  // mid ans deta but mid hi bda h to ab kahan 'key' hmko mil sakta h. mid se phle
+            up = mid - 1;
+        else
+            low = mid + 1;
+    }
+    return -1;
+}
+
+//template 2
+int smallestDivisor(int[] nums, int threshold) {
+    int start = 1, end = Arrays.stream(nums).max().getAsInt();
+
+    while (start < end) {
+        int mid = start + (end - start) / 2;
+        int sum = 0;
+        for (int n : nums)
+            sum += (n + mid - 1) / mid;  // ceil(n / mid)
+
+        if (sum <= threshold)
+            end = mid;
+        else
+            start = mid + 1;
+    }
+    return start;
+}
+
+//template 3
+int binary_search(int[] arr, int key) {
+    int n = arr.length;
+    int low = 0, up = n - 1;
+    while (low < up) {
+        int mid = low + (up - low) / 2;
+        if (arr[mid] <= key)
+            low = mid;
+        else
+            up = mid - 1;
+    }
+    return (arr[low] == key) ? low : -1;
+}
+
+//template 4
+int binary_search(int[] nums, int target) {
+    int start = 0, end = nums.length - 1;
+    while (start <= end) {
+        int mid = start + (end - start) / 2;
+        if (nums[mid] <= target)   // isPossible(mid)
+            start = mid + 1;       // for finding larger index. means we have to find beyond mid
+        else
+            end = mid - 1;
+    }
+    return end;
+}
+
+//template 5
+int binary_search(vector<int>& arr, int key) {
+    int n = arr.size();
+    int low = 0, up = n - 1;
+    while (low <= up) {
+        int mid = low + (up - low) / 2;
+        if (arr[mid] >= key)
+            up = mid - 1;     // agar hmko target ele hi find karna h kisi smaller index pe then do this
+        else
+            low = mid + 1;
+    }
+    return low;
+}
+
+"""
+
+# C++ Templates 
+"""
+//template 1
+#include <vector>
+
+using namespace std;
+
+/*
+Template 1:
+Note: Use this template when elements may not be present, and we need to return a valid index or value if missing.
+Example problems:
+1) Find ceil and floor of a number in a sorted array
+2) Find square root of a number
+3) Find the first bad version
+4) 744. Find Smallest Letter Greater Than Target
+5) 35. Search Insert Position
+
+Key observation: After the loop ends, `low` gives the ceil value (just greater than key),
+`high` gives the floor value (just less than key), since `low` is exactly `high + 1`.
+
+Duplicates: This may return any valid index if duplicates exist.
+*/
+int binarySearch(vector<int>& arr, int key) {
+    int n = arr.size();
+    int low = 0, up = n - 1;
+
+    while (low <= up) {
+        int mid = low + (up - low) / 2;
+        if (arr[mid] == key) return mid;
+        if (arr[mid] > key) up = mid - 1;
+        else low = mid + 1;
+    }
+    return -1;
+}
+//template 2
+int smallestDivisor(vector<int>& nums, int threshold) {
+    auto isSum = [&](int mid) {
+        int sum = 0;
+        for (int n : nums)
+            sum += (n + mid - 1) / mid;  // ceil(n / mid)
+        return sum;
+    };
+
+    int start = 1, end = *max_element(nums.begin(), nums.end());
+    while (start < end) {
+        int mid = start + (end - start) / 2;
+        if (isSum(mid) <= threshold)
+            end = mid;
+        else
+            start = mid + 1;
+    }
+    return start;
+}
+
+//template 3
+int binary_search(vector<int>& arr, int key) {
+    int n = arr.size();
+    int low = 0, up = n - 1;
+    while (low < up) {
+        int mid = low + (up - low) / 2;
+        if (arr[mid] <= key)
+            low = mid;
+        else
+            up = mid - 1;
+    }
+    return (arr[low] == key) ? low : -1;
+}
+
+//template 4
+int binary_search(vector<int>& nums, int target) {
+    int start = 0, end = nums.size() - 1;
+    while (start <= end) {
+        int mid = start + (end - start) / 2;
+        if (nums[mid] <= target)   // isPossible(mid)
+            start = mid + 1;       // for finding larger index. means we have to find beyond mid
+        else
+            end = mid - 1;
+    }
+    return end;
+}
+
+//template 5
+int binary_search(vector<int>& arr, int key) {
+    int n = arr.size();
+    int low = 0, up = n - 1;
+    while (low <= up) {
+        int mid = low + (up - low) / 2;
+        if (arr[mid] >= key)
+            up = mid - 1;     // agar hmko target ele hi find karna h kisi smaller index pe then do this
+        else
+            low = mid + 1;
+    }
+    return low;
+}
+
+"""
+
+
+
+
+# Solution of actual question  
+# Method 1:
+class Solution:
+    def search(self, arr: List[int], key: int) -> int:
+        n= len(arr)
+        low=0
+        up= n-1
+        while(low<= up):
+            mid= low+ (up-low)//2
+            if arr[mid] == key:
+                return mid
+            elif(arr[mid]> key):  # mid ans deta but mid hi bda h to ab kahan 'key' hmko mil sakta h. mid se phle
+                up= mid-1
+            elif(arr[mid]<key):
+                low= mid+1
+        return -1
+        
+
+# Java
+class Solution:
+    def search(self, arr: List[int], key: int) -> int:
+        n= len(arr)
+        low=0
+        up= n-1
+        while(low<= up):
+            mid= low+ (up-low)//2
+            if arr[mid] == key:
+                return mid
+            elif(arr[mid]> key):  # mid ans deta but mid hi bda h to ab kahan 'key' hmko mil sakta h. mid se phle
+                up= mid-1
+            elif(arr[mid]<key):
+                low= mid+1
+        return -1
+        
+
+# Java
+"""
+class Solution {
+    public int search(int[] arr, int key) {
+        int n = arr.length;
+        int low = 0;
+        int up = n - 1;
+        
+        while (low <= up) {
+            int mid = low + (up - low) / 2;
+            if (arr[mid] == key) {
+                return mid;
+            } else if (arr[mid] > key) {  // 'key' will be before mid if mid is greater
+                up = mid - 1;
+            } else {  // 'key' will be after mid if mid is smaller
+                low = mid + 1;
+            }
+        }
+        return -1;  // 'key' is not present in the array
+    }
+}
+"""
+
+
+# C++
+"""
+class Solution {
+public:
+    int search(vector<int>& arr, int key) {
+        int n = arr.size();
+        int low = 0;
+        int up = n - 1;
+        
+        while (low <= up) {
+            int mid = low + (up - low) / 2;
+            if (arr[mid] == key) {
+                return mid;
+            } else if (arr[mid] > key) {  // 'key' will be before mid if mid is greater
+                up = mid - 1;
+            } else {  // 'key' will be after mid if mid is smaller
+                low = mid + 1;
+            }
+        }
+        return -1;  // 'key' is not present in the array
+    }
+};
+"""

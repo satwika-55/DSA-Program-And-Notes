@@ -1,4 +1,3 @@
-# 1st method : 
 # time: O(n)
 # just compare the ele with its next ele
 # in rotated and sorted array above condition will hold exactly once or zero time(in case array is already sorted in ascending order)
@@ -33,4 +32,27 @@ class Solution {
         return count <= 1;
     }
 }
+"""
+
+# C++ Code 
+"""
+#include <vector>
+
+using namespace std;
+
+class Solution {
+public:
+    bool check(vector<int>& nums) {
+        int n = nums.size();
+        int count = 0;
+
+        for (int i = 0; i < n; i++) {
+            if (nums[i] > nums[(i + 1) % n]) {
+                count++;
+            }
+        }
+
+        return count <= 1;
+    }
+};
 """

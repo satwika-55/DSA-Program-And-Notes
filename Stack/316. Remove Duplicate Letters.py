@@ -34,40 +34,106 @@ class Solution:
                 visited.add(s[i])
         return "".join(stack)
 
+# Java Code 
+"""
+import java.util.*;
+
+public class Solution {
+    public String removeDuplicateLetters(String s) {
+        Map<Character, Integer> last_index = new HashMap<>();  // will store the last_index of each char in the string
+        Set<Character> visited = new HashSet<>();              // will tell whether curr char has been added to stack already or not.
+        Stack<Character> stack = new Stack<>();                // at last we will get ans in stack. keep track of selected character's.
+                                                               // put the character's only once & maintain the lexicographically smallest one.
+
+        // first storing the last index of each char so in case of duplicate we can check whether 
+        // we can remove stack top char or not for maintaining lexicographically smallest order.
+        for (int i = 0; i < s.length(); i++) {
+            last_index.put(s.charAt(i), i);
+        }
+
+        // now getting the ans
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+
+            // if c already in stack then simply skip.
+            if (!visited.contains(c)) {
+                // Keep on removing char from stack if : 
+                // 1) stack top is greater and 2) stack top char has another occurrence also after index 'i'.
+                while (!stack.isEmpty() && stack.peek() > c && last_index.get(stack.peek()) > i) {
+                    visited.remove(stack.pop());  // Removing from visited also 
+                }
+                stack.push(c);
+                visited.add(c);
+            }
+        }
+
+        // Build result
+        StringBuilder sb = new StringBuilder();
+        for (char ch : stack) {
+            sb.append(ch);
+        }
+
+        return sb.toString();
+    }
+}
+
+"""
+# C++ Code 
+"""
+#include <iostream>
+#include <string>
+#include <unordered_map>
+#include <unordered_set>
+#include <stack>
+using namespace std;
+
+class Solution {
+public:
+    string removeDuplicateLetters(string s) {
+        unordered_map<char, int> last_index;  // will store the last_index of each char in the string
+        unordered_set<char> visited;          // will tell whether curr char has been added to stack already or not.
+        stack<char> stack;                    // at last we will get ans in stack. keep track of selected character's.
+                                              // put the character's only once & maintain the lexicographically smallest one.
+
+        // first storing the last index of each char so in case of duplicate we can check whether 
+        // we can remove stack top char or not for maintaining lexicographically smallest order.
+        for (int i = 0; i < s.size(); i++) {
+            last_index[s[i]] = i;
+        }
+
+        // now getting the ans
+        for (int i = 0; i < s.size(); i++) {
+            char c = s[i];
+
+            // if c already in stack then simply skip.
+            if (visited.find(c) == visited.end()) {
+                // Keep on removing char from stack if : 
+                // 1) stack top is greater and 2) stack top char has another occurrence also after index 'i'.
+                while (!stack.empty() && stack.top() > c && last_index[stack.top()] > i) {
+                    visited.erase(stack.top());  // Removing from visited also 
+                    stack.pop();
+                }
+                stack.push(c);
+                visited.insert(c);
+            }
+        }
+
+        // Build result
+        string result;
+        while (!stack.empty()) {
+            result += stack.top();
+            stack.pop();
+        }
+        reverse(result.begin(), result.end());
+        return result;
+    }
+};
+
+"""
 
 # Related Q:
 # 1) 1081. Smallest Subsequence of Distinct Characters
 # Exactly same question 
 
-# Java
 # about 'join' in java
 # link: https://www.geeksforgeeks.org/java-string-join-examples/
-"""
-class Solution {
-    public String removeDuplicateLetters(String s) {
-        int n = s.length();
-        Stack<Character> stack = new Stack<>();
-        Set<Character>  set = new HashSet<>();
-        Map<Character, Integer> lastIndex = new HashMap<>();
-        for(int i = 0; i < n; i ++) {
-            lastIndex.put(s.charAt(i), i);
-        }
-        for(int i = 0; i < n; i ++) {
-            Character c = s.charAt(i) ;
-            if(!set.contains(c)) {
-                while(!stack.isEmpty() && stack.peek() > c && lastIndex.get(stack.peek()) > i) {
-                    set.remove(stack.pop()) ;
-                }
-                stack.push(c);
-                set.add(c);
-            }
-        }
-        // return String.join(",", stack);   // 'join' works on string not on character
-        StringBuilder ans = new StringBuilder();
-        for(Character c : stack){
-            ans.append(c);
-        }
-        return ans.toString();
-    }
-}
-"""

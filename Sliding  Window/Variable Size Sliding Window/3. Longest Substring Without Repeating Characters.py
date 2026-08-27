@@ -1,3 +1,5 @@
+# Method 1: 
+
 # Similar as as 'longest substring with k unique char' 
 # only diff is there in condition: 'window size should contain all unique char'
 # which means window size should be equal to len(hashmap).
@@ -51,3 +53,68 @@ class Solution {
     }
 }
 """
+
+# C++ Code 
+"""
+#include <iostream>
+#include <unordered_map>
+#include <string>
+
+using namespace std;
+
+class Solution {
+public:
+    int lengthOfLongestSubstring(string s) {
+        unordered_map<char, int> hashmap;
+        int max_length = 0, i = 0, j = 0, n = s.length();
+
+        while (j < n) {
+            hashmap[s[j]]++;  // Update frequency count
+
+            // It can only happen if the window contains duplicate characters
+            while (hashmap.size() < j - i + 1) {  
+                hashmap[s[i]]--;
+                if (hashmap[s[i]] == 0) {
+                    hashmap.erase(s[i]);  
+                }
+                i++;
+            }
+            max_length = max(max_length, j - i + 1);
+            j++;
+        }
+        return max_length;
+    }
+};
+"""
+
+# Method 2:
+"""
+you might be asked if you can skip the inner while loop entirely. 
+Instead of storing the count of characters, you can store the last seen index of each character. 
+When you encounter a duplicate, you can "jump" the left pointer i directly to last_seen_index.
+
+Time = space = O(n)
+"""
+
+class Solution:
+    def lengthOfLongestSubstring(self, s: str) -> int:
+        # map to store the last seen index of each character
+        last_seen = {}
+        max_length = 0
+        i = 0
+        
+        for j in range(len(s)):
+            char = s[j]
+            
+            # If we've seen this character before AND it's inside our current window
+            if char in last_seen and last_seen[char] >= i:
+                # Jump the left pointer to the right of the previous occurrence
+                i = last_seen[char] + 1
+            
+            # Record/Update the current character's position
+            last_seen[char] = j
+            
+            # Calculate length and update maximum
+            max_length = max(max_length, j - i + 1)
+            
+        return max_length

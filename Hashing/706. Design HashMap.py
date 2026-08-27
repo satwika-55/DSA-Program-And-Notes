@@ -1,3 +1,4 @@
+"""
 # Logic: each index will store a singly linked list
 
 # For avoiding collision and even distribution of keys 
@@ -27,8 +28,9 @@
 # No specific reason. For the size, I wanted something that was larger than the number of possible operations
 # (10^4), but as small as possible without risking too many collisions, and preferably prime. 
 # The other is just a random large multiplier, also preferably a prime.
+"""
 
-# using Array
+# Method 1: using Array
 class MyHashMap:
     def __init__(self):
         self.data = [None] * 1000001
@@ -40,7 +42,7 @@ class MyHashMap:
     def remove(self, key: int) -> None:
         self.data[key] = None
 
-# using linked list
+# Method 2: using linked list
 class ListNode:
     def __init__(self, key, val, nxt):
         self.key = key
@@ -79,7 +81,7 @@ class MyHashMap:
             node = node.next
 
 # java
-# using array
+# Method 1: using array
 """
 class MyHashMap {
     int[] data;
@@ -99,7 +101,7 @@ class MyHashMap {
 }
 """
 
-# using linked list
+# Method 2: using linked list
 """"
 class ListNode {
     int key, val;
@@ -159,4 +161,92 @@ class MyHashMap {
     }
 }
 
+"""
+
+# C++ Code 
+"""
+//Using Array
+#include <vector>
+using namespace std;
+
+class MyHashMap {
+private:
+    vector<int> data;
+
+public:
+    MyHashMap() : data(1000001, -1) {}
+
+    void put(int key, int val) {
+        data[key] = val;
+    }
+
+    int get(int key) {
+        return data[key] == -1 ? -1 : data[key];
+    }
+
+    void remove(int key) {
+        data[key] = -1;
+    }
+};
+
+//method 2"   Using linkedlist
+#include <vector>
+using namespace std;
+
+class ListNode {
+public:
+    int key, val;
+    ListNode* next;
+    ListNode(int k, int v, ListNode* n) : key(k), val(v), next(n) {}
+};
+
+class MyHashMap {
+private:
+    const int size = 19997;
+    const int mult = 12582917;
+    vector<ListNode*> data;
+
+    int hash(int key) {
+        return key * mult % size;
+    }
+
+public:
+    MyHashMap() : data(size, nullptr) {}
+
+    void put(int key, int val) {
+        remove(key);
+        int h = hash(key);
+        data[h] = new ListNode(key, val, data[h]);
+    }
+
+    int get(int key) {
+        int h = hash(key);
+        ListNode* node = data[h];
+        while (node) {
+            if (node->key == key) return node->val;
+            node = node->next;
+        }
+        return -1;
+    }
+
+    void remove(int key) {
+        int h = hash(key);
+        ListNode* node = data[h];
+        if (!node) return;
+        if (node->key == key) {
+            data[h] = node->next;
+            delete node;
+            return;
+        }
+        while (node->next) {
+            if (node->next->key == key) {
+                ListNode* temp = node->next;
+                node->next = node->next->next;
+                delete temp;
+                return;
+            }
+            node = node->next;
+        }
+    }
+};
 """

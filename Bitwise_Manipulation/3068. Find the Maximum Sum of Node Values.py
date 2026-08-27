@@ -1,3 +1,5 @@
+# Method 1: 
+
 # Logic: 1) For max we should take xor of any number at most once because doing xor 
 # with same number again will bring to original number.
 # e.g: n ^ x ^ x = n
@@ -45,7 +47,6 @@ class Solution:
         return ans + sum(nums)
 
 
-# later do in O(n) and O(1) space using solution in sheet.
 
 
 # Java
@@ -83,6 +84,40 @@ class Solution {
         return ans;
     }
 }
+"""
+
+# C++ Code
+"""
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+class Solution {
+public:
+    int maximumValueSum(vector<int>& nums, int k, vector<vector<int>>& edges) {
+        int n = nums.size();
+        vector<int> delta(n);
+
+        // Compute delta values
+        for (int i = 0; i < n; i++) {
+            delta[i] = (nums[i] ^ k) - nums[i];
+        }
+
+        // Sort in descending order
+        sort(delta.rbegin(), delta.rend());
+
+        int ans = 0;
+        for (int i = 0; i < n - 1; i += 2) {
+            if (delta[i] + delta[i + 1] > 0) {
+                ans += delta[i] + delta[i + 1];
+            }
+        }
+
+        return ans + accumulate(nums.begin(), nums.end(), 0);
+    }
+};
 """
 
 # Why we can't sort in reverse order directly using below:

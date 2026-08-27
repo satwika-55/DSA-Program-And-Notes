@@ -1,31 +1,43 @@
-# how we can think this is a greedy based problem.
-# we can only start from station whose gas capacity- cost to reach another station is >=0. 
-# we are greedy about above diff only.
+# method 1:
 
-# start from '0'th gas station and 
-# if we run out of fuel say at some ith gas station. All the gas station between ith and starting point are bad starting point as well.
-# So, this means we can start trying at next gas station on the i + 1 station.
-# i.e If we are not able to reach 'B' from "A" the, no station that is in between 'A' and 'B' can reach 'B'.\
+"""
+how we can think this is a greedy based problem.
+we can only start from station whose gas capacity- cost to reach another station is >=0. 
+we are greedy about above diff only.
 
-# Proof?
-# suppose there are c1,c2,...,ck station between 'A' and 'B'.
-# A --- C1 --- C2  --- ... Ck --- B
+start from '0'th gas station and 
+if we run out of fuel say at some ith gas station. All the gas station between ith and starting point are bad starting point as well.
+So, this means we can start trying at next gas station on the i + 1 station.
+i.e If we are not able to reach 'B' from "A" the, no station that is in between 'A' and 'B' can reach 'B'.\
 
-# Facts:
-# i)   A cannot reach B
-# ii)  There are C1,C2, ..., Ck between A and B
-# iii) A can reach C1, C2, ..., Ck
+Proof?
+suppose there are c1,c2,...,ck station between 'A' and 'B'.
+A --- C1 --- C2  --- ... Ck --- B
 
-# Proof by contradiction:
-# Assume: C1 can reach B
-# A can reach C1 (by Fact3) & C1 can reach B => A can reach B (Contradict with Fact1 !)
-# => assumption is wrong, C1 cannot reach B
-# Same proof could be applied to C2 ~ Ck
-# => any station between A and B that A can reach cannot reach B
+Facts:
+i)   A cannot reach B
+ii)  There are C1,C2, ..., Ck between A and B
+iii) A can reach C1, C2, ..., Ck
 
-# Note: we don't need to check in circular way because of above reason only.
+Proof by contradiction:
+Assume: C1 can reach B
+A can reach C1 (by Fact3) & C1 can reach B => A can reach B (Contradict with Fact1 !)
+=> assumption is wrong, C1 cannot reach B
+Same proof could be applied to C2 ~ Ck
+=> any station between A and B that A can reach cannot reach B
 
-# time: O(n)
+Short : If starting at C_1 with 0 gas could get you all the way to B, then starting at A (which gets you to C_1 with >= 0 gas) 
+would definitely get you to B. But we already know A failed to reach B. Therefore, starting fresh at C_1 stands absolutely no chance.
+
+Note: Why don't we need to check the "circular" path at the end?
+Ans : because we verified : if sum(gas) < sum(cost):
+Because we already verified that the total global gas >= total global cost, we are guaranteed that a solution exists. 
+Since our loop successfully eliminates all the "bad" starting points up to the final index, whatever value is left in start must be the correct unique starting point. 
+It doesn't need to validate the wrap-around loop because the math ensures it will have enough leftover fuel to cover any deficits encountered in the beginning.
+
+time: O(n), space: O(1)
+"""
+
 class Solution:
     def canCompleteCircuit(self, gas: List[int], cost: List[int]) -> int:
         if sum(gas) < sum(cost):  # not possible from any gas station
@@ -39,3 +51,64 @@ class Solution:
                 start = i+1
                 total = 0
         return start
+
+# Java Code 
+"""
+class Solution {
+    public int canCompleteCircuit(int[] gas, int[] cost) {
+        int n = gas.length;
+        int totalGas = 0, totalCost = 0;
+        for (int i = 0; i < n; i++) {
+            totalGas += gas[i];
+            totalCost += cost[i];
+        }
+        if (totalGas < totalCost) return -1;  // not possible from any gas station
+
+        int start = 0;  // our ans
+        int total = 0;  // store the total gas present
+
+        // checking each gas station one by one, we can only choose any gas station
+        // if difference of gas[i] and cost[i] >= 0.
+        for (int i = 0; i < n; i++) {
+            total += gas[i] - cost[i];  // we are just taking diff
+            if (total < 0) {  // means from this gas station 'start' we can't complete a circle
+                start = i + 1;
+                total = 0;
+            }
+        }
+        return start;
+    }
+}
+
+"""
+
+# C++ Code 
+"""
+class Solution {
+public:
+    int canCompleteCircuit(vector<int>& gas, vector<int>& cost) {
+        int n = gas.size();
+        int totalGas = 0, totalCost = 0;
+        for (int i = 0; i < n; i++) {
+            totalGas += gas[i];
+            totalCost += cost[i];
+        }
+        if (totalGas < totalCost) return -1;  // not possible from any gas station
+
+        int start = 0;  // our ans
+        int total = 0;  // store the total gas present
+
+        // checking each gas station one by one, we can only choose any gas station
+        // if difference of gas[i] and cost[i] >= 0.
+        for (int i = 0; i < n; i++) {
+            total += gas[i] - cost[i];  // we are just taking diff
+            if (total < 0) {  // means from this gas station 'start' we can't complete a circle
+                start = i + 1;
+                total = 0;
+            }
+        }
+        return start;
+    }
+};
+
+"""

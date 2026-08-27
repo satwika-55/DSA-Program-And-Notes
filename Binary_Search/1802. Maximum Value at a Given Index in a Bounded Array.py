@@ -1,10 +1,19 @@
+# Method 1: 
+
 # Real meaning of Q: How I read this problem is you have n kids, maxSum dollar, and index is your special or favourite child. 
 # Need to distribute the max dollar b/w n kid with given condition. (Fav kid(index) should get max amount)?
 
 # logic: 
-# The minimum case would be nums[index] is a peak in nums.
-# It's arithmetic sequence on the left of A[index] with difference is 1.
-# It's also arithmetic sequence on the right of A[index] with difference is -1.
+"""
+The minimum case would be nums[index] is a peak in nums, because of given conditions:
+i) abs(nums[i] - nums[i+1]) <= 1 where 0 <= i < n-1.
+ii) The sum of all the elements of nums does not exceed maxSum.
+So, 
+It's arithmetic sequence on the left of A[index] with difference is 1, and when index value reaches = 1 then all elements onwards that index will be '1'
+It's also arithmetic sequence on the right of A[index] with difference is -1, and when index value reaches = 0 then all elements onwards that index will be '1'
+
+Time Complexity: O(log(maxSum)).
+"""
 
 class Solution:
     def maxValue(self, n: int, index: int, maxSum: int) -> int:
@@ -42,3 +51,95 @@ class Solution:
             else:
                 end = mid -1
         return end
+
+# Java Code 
+"""
+public class Solution {
+    public int maxValue(int n, int index, int maxSum) {
+        int l = index;         // no of ele on left side of 'index'
+        int r = n - index - 1; // no of ele on right side of 'index'
+        int start = 1, end = maxSum - (n - 1);  // Possible value at index
+
+        while (start <= end) {
+            int mid = start + (end - start) / 2;
+            // check if we can make total sum <= maxSum when nums[index] = mid
+            if (isPossible(mid, l, r, maxSum)) {
+                // means we can try for greater number
+                start = mid + 1;
+            } else {
+                end = mid - 1;
+            }
+        }
+        return end;
+    }
+
+    // check if it is possible to build the array with peak = mid and total sum <= maxSum
+    private boolean isPossible(int mid, int l, int r, int maxSum) {
+        int m = mid - 1;  // from this num we will start placing on both sides to maintain diff of '1'
+        long leftSum = 0, rightSum = 0;
+
+        // Calculating for right part
+        if (r <= m) {
+            // if no of ele on right is <= 'm'.
+            rightSum = (long) m * (m + 1) / 2 - (long) (m - r) * (m - r + 1) / 2;
+        } else {
+            // fill the remaining with '1'
+            rightSum = (long) m * (m + 1) / 2 + (r - m);
+        }
+
+        // Calculating for left part in same way
+        if (l <= m) {
+            leftSum = (long) m * (m + 1) / 2 - (long) (m - l) * (m - l + 1) / 2;
+        } else {
+            leftSum = (long) m * (m + 1) / 2 + (l - m);
+        }
+
+        return leftSum + mid + rightSum <= maxSum;
+    }
+}
+"""
+# C++ Code 
+"""
+class Solution {
+public:
+    int maxValue(int n, int index, int maxSum) {
+        int l = index;         // no of ele on left side of 'index'
+        int r = n - index - 1; // no of ele on right side of 'index'
+        int start = 1, end = maxSum - (n - 1);  // Possible value at index
+
+        while (start <= end) {
+            int mid = start + (end - start) / 2;
+            // check if we can make total sum <= maxSum when nums[index] = mid
+            if (isPossible(mid, l, r, maxSum)) {
+                start = mid + 1;  // try greater number
+            } else {
+                end = mid - 1;
+            }
+        }
+        return end;
+    }
+
+private:
+    // check if it is possible to build the array with peak = mid and total sum <= maxSum
+    bool isPossible(int mid, int l, int r, int maxSum) {
+        int m = mid - 1;  // from this num we will start placing on both sides to maintain diff of '1'
+        long long leftSum = 0, rightSum = 0;
+
+        // Calculating for right part
+        if (r <= m) {
+            rightSum = 1LL * m * (m + 1) / 2 - 1LL * (m - r) * (m - r + 1) / 2;
+        } else {
+            rightSum = 1LL * m * (m + 1) / 2 + (r - m);
+        }
+
+        // Calculating for left part in same way
+        if (l <= m) {
+            leftSum = 1LL * m * (m + 1) / 2 - 1LL * (m - l) * (m - l + 1) / 2;
+        } else {
+            leftSum = 1LL * m * (m + 1) / 2 + (l - m);
+        }
+
+        return leftSum + mid + rightSum <= maxSum;
+    }
+};
+"""

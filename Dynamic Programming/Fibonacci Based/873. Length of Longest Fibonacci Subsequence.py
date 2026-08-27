@@ -30,31 +30,68 @@ class Solution:
                 res = max(res, l)
         return res if res > 2 else 0
 
-# Java
+# Java Code 
 """
-class Solution {
+import java.util.*;
+
+public class Solution {
     public int lenLongestFibSubseq(int[] A) {
-        Set<Integer> s = new HashSet<Integer>();
-        for (int x : A) s.add(x);
+        int n = A.length;
+        Set<Integer> s = new HashSet<>();
+        for (int num : A)
+            s.add(num);
+
         int res = 2;
-        for (int i = 0; i < A.length; ++i)
-            for (int j = i + 1; j < A.length; ++j) {
-                int a = A[i], b = A[j], l = 2;
+        for (int i = 0; i < n; i++) {
+            for (int j = i + 1; j < n; j++) {
+                int a = A[i], b = A[j], len = 2;
                 while (s.contains(a + b)) {
-                    int temp = b;
-                    b = a + b;
-                    a = temp ;
-                    l++;
+                    int temp = a + b;
+                    a = b;
+                    b = temp;
+                    len++;
                 }
-                res = Math.max(res, l);
+                res = Math.max(res, len);
             }
+        }
+
         return res > 2 ? res : 0;
-        
     }
 }
 """
+# C++ Code 
+"""
+#include <vector>
+#include <unordered_set>
+#include <algorithm>
 
-# Method 2: DP + 2 sum
+class Solution {
+public:
+    int lenLongestFibSubseq(std::vector<int>& A) {
+        int n = A.size();
+        std::unordered_set<int> s(A.begin(), A.end());
+
+        int res = 2;
+        for (int i = 0; i < n; ++i) {
+            for (int j = i + 1; j < n; ++j) {
+                int a = A[i], b = A[j], len = 2;
+                while (s.count(a + b)) {
+                    int temp = a + b;
+                    a = b;
+                    b = temp;
+                    ++len;
+                }
+                res = std::max(res, len);
+            }
+        }
+
+        return res > 2 ? res : 0;
+    }
+};
+"""
+
+# Method 2: 
+# DP + 2 sum
 # Logic:
 """
 For each A[i] find previous 2 elements sum up to A[i],
@@ -85,32 +122,65 @@ class Solution:
                     l += 1
         return ans
 
-# Java
+# Java Code 
 """
-    public int lenLongestFibSubseq(int[] A) {
-        int n = A.length;
-        int max = 0;
-        int[][] dp = new int[n][n];
+import java.util.*;
+
+public class Solution {
+    public int lenLongestFibSubseq(int[] nums) {
+        int n = nums.length;
+        int[][] dp = new int[n][n];  // default length will be two only between every pair.
+        for (int[] row : dp)
+            Arrays.fill(row, 2);
+
+        int ans = 0;
         for (int i = 2; i < n; i++) {
             int l = 0, r = i - 1;
-	        while (l < r) {
-                int sum = A[l] + A[r];
-                if (sum > A[i]) {
-                    r--;  
-                } else if (sum < A[i]) {
-                    l++;
+            while (l < r) {
+                if (nums[l] + nums[r] > nums[i]) {
+                    r -= 1;
+                } else if (nums[l] + nums[r] < nums[i]) {
+                    l += 1;
                 } else {
                     dp[r][i] = dp[l][r] + 1;
-                    max = Math.max(max, dp[r][i]);
-                    r--;
-                    l++;
+                    ans = Math.max(ans, dp[r][i]);
+                    r -= 1;
+                    l += 1;
                 }
             }
         }
-        return max == 0 ? 0 : max + 2;
+        return ans;
     }
-
-
+}
 """
+# C++ Code 
+"""
+#include <vector>
+#include <algorithm>
 
-# Note: Understand and do by this later, solution in sheet
+class Solution {
+public:
+    int lenLongestFibSubseq(std::vector<int>& nums) {
+        int n = nums.size();
+        std::vector<std::vector<int>> dp(n, std::vector<int>(n, 2));  // default length will be two only between every pair.
+        int ans = 0;
+
+        for (int i = 2; i < n; ++i) {
+            int l = 0, r = i - 1;
+            while (l < r) {
+                if (nums[l] + nums[r] > nums[i]) {
+                    --r;
+                } else if (nums[l] + nums[r] < nums[i]) {
+                    ++l;
+                } else {
+                    dp[r][i] = dp[l][r] + 1;
+                    ans = std::max(ans, dp[r][i]);
+                    --r;
+                    ++l;
+                }
+            }
+        }
+        return ans;
+    }
+};
+"""

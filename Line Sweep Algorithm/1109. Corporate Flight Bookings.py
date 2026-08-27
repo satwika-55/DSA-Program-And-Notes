@@ -1,3 +1,5 @@
+# method 1 : 
+
 # Brute force: for each flight in range add given seats.
 # time: O(n^2), space = O(n)
 
@@ -15,7 +17,58 @@ class Solution:
 
         return answer
 
+# Java Code 
+"""
+import java.util.*;
 
+class Solution {
+    public int[] corpFlightBookings(int[][] bookings, int n) {
+        // Initialize the result array with zeros
+        int[] answer = new int[n];
+
+        // Process each booking
+        for (int[] booking : bookings) {
+            int first = booking[0], last = booking[1], seats = booking[2];
+            // Update the seat counts for the range of flights
+            for (int i = first - 1; i < last; i++) {
+                answer[i] += seats;
+            }
+        }
+
+        return answer;
+    }
+}
+
+"""
+
+# C++ Code 
+"""
+#include <vector>
+
+using namespace std;
+
+class Solution {
+public:
+    vector<int> corpFlightBookings(vector<vector<int>>& bookings, int n) {
+        // Initialize the result array with zeros
+        vector<int> answer(n, 0);
+
+        // Process each booking
+        for (auto& booking : bookings) {
+            int first = booking[0], last = booking[1], seats = booking[2];
+            // Update the seat counts for the range of flights
+            for (int i = first - 1; i < last; i++) {
+                answer[i] += seats;
+            }
+        }
+
+        return answer;
+    }
+};
+"""
+
+
+# Method 2: 
 # Optimisation using: Sweep line
 
 # Idea:
@@ -56,8 +109,55 @@ class Solution:
             answer[i] += answer[i - 1]
         return answer
 
-# Similar question
-# 1. 2381. Shifting Letters II
+# Java Code 
+"""
+class Solution {
+    public int[] corpFlightBookings(int[][] bookings, int n) {
+        // Initialize the result array with zeros
+        int[] answer = new int[n];
+
+        // Process each booking efficiently
+        for (int[] booking : bookings) {
+            int first = booking[0], last = booking[1], seats = booking[2];
+            answer[first - 1] += seats;
+            if (last < n) {
+                answer[last] -= seats;
+            }
+        }
+        for (int i = 1; i < n; i++) {
+            answer[i] += answer[i - 1];
+        }
+
+        return answer;
+    }
+}
+"""
+
+# C++ Code 
+"""
+class Solution {
+public:
+    vector<int> corpFlightBookings(vector<vector<int>>& bookings, int n) {
+        // Initialize the result array with zeros
+        vector<int> answer(n, 0);
+
+        // Process each booking efficiently
+        for (auto& booking : bookings) {
+            int first = booking[0], last = booking[1], seats = booking[2];
+            answer[first - 1] += seats;
+            if (last < n) {
+                answer[last] -= seats;
+            }
+        }
+        for (int i = 1; i < n; i++) {
+            answer[i] += answer[i - 1];
+        }
+
+        return answer;
+    }
+};
+"""
+
 
 
         

@@ -1,6 +1,4 @@
-
-
-# method 1:
+# Basic: 
 
 # But this is interesting one because of :
 # 1) even no of piles
@@ -26,9 +24,10 @@
 
 # So, Alex always defeats Bob in this game.
 
-# Thata's why simply return True
+# That's why simply return True 
 
-# method 2:
+
+# method 1:
 # totally same as 486. predict winner, so didn't submit.
 
 class Solution:
@@ -44,3 +43,57 @@ class Solution:
             return nums[i]
         return max(nums[i] + min(self.FindScore(nums, i +2, j), self.FindScore(nums, i +1, j-1)),
                 nums[j] + min(self.FindScore(nums, i , j-2), self.FindScore(nums, i+1 , j-1)))
+
+# Java Code 
+"""
+class Solution {
+    public boolean stoneGame(int[] piles) {
+        int n = piles.length;
+        int AliceScore = findScore(piles, 0, n - 1);
+        int total = 0;
+        for (int p : piles) total += p;
+        return AliceScore >= total - AliceScore;
+    }
+
+    public int findScore(int[] nums, int i, int j) {
+        if (i > j)
+            return 0;
+        if (i == j)  // only one ele remaining. both indexes are included so.
+            return nums[i];
+
+        return Math.max(
+            nums[i] + Math.min(findScore(nums, i + 2, j), findScore(nums, i + 1, j - 1)),
+            nums[j] + Math.min(findScore(nums, i, j - 2), findScore(nums, i + 1, j - 1))
+        );
+    }
+}
+"""
+# C++ Code 
+"""
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+class Solution {
+public:
+    bool stoneGame(vector<int>& piles) {
+        int n = piles.size();
+        int AliceScore = findScore(piles, 0, n - 1);
+        int total = 0;
+        for (int p : piles) total += p;
+        return AliceScore >= total - AliceScore;
+    }
+
+    int findScore(vector<int>& nums, int i, int j) {
+        if (i > j)
+            return 0;
+        if (i == j)  // only one ele remaining. both indexes are included so.
+            return nums[i];
+
+        return max(
+            nums[i] + min(findScore(nums, i + 2, j), findScore(nums, i + 1, j - 1)),
+            nums[j] + min(findScore(nums, i, j - 2), findScore(nums, i + 1, j - 1))
+        );
+    }
+};
+"""

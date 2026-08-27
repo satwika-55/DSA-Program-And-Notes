@@ -1,3 +1,5 @@
+# Method 1: 
+
 # smallest ele will be at the start only. 
 # So we will push (nums1[0] + nums1[0] ,0, 0) => (sum, index1, index2).
 # But next minimum can be at index (0, 1) or (1, 0).
@@ -20,7 +22,7 @@
 import heapq
 class Solution:
     def kSmallestPairs(self, nums1: List[int], nums2: List[int], k: int) -> List[List[int]]:
-        visited= set()
+        visited= set()   # O(K)
         visited.add((0,0))
         heap, ans= [], []
         heapq.heappush(heap,(nums1[0]+ nums2[0],0,0))   # (sum, i, j)  # i, j index of nums1 and nums2.
@@ -36,10 +38,132 @@ class Solution:
                 heapq.heappush(heap,(nums1[i+1]+ nums2[j], i+1, j))
 
         return ans
-    
 
-# Related Q:
+# without visited set
+"""
+Memory Efficiency: We've removed the visited set entirely. In the previous version, the set could grow up to O(k). Here, extra space is purely the heap.
+
+Logic:
+The "duplicate" problem happens because cell (1, 1) can be reached from both (0, 1) and (1, 0).
+The Trick: Instead of allowing every cell to move both Right and Down, we restrict the movement:
+1. Initially: Push the first element of nums1 paired with every element in nums2 (up to k). 
+    Pairs: (0, 0), (1, 0), (2, 0) ....
+2. During Iteration: When we pop (i, j), we only push the next element from nums2.
+    Pair: (i, j+1).
+By only moving "Right" after the initial "Down" column is set, every unique coordinate (i, j) has exactly one parent path.
+This mathematically eliminates the need for a visited set.
+"""
+
+
+# Follow ups:
+"""
+1) Follow-up: "What if the arrays are not sorted?"
+If they aren't sorted, we have two options:
+    Sort them first (O(N*log N + M *log M)) and then use the heap approach.
+    If k is very small, use a Max-Heap of size k to track the smallest pairs while iterating through all M * N pairs (O(M * N *log k)).
+"""
+
+import heapq
+
+class Solution:
+    def kSmallestPairs(self, nums1: list[int], nums2: list[int], k: int) -> list[list[int]]:
+        if not nums1 or not nums2 or k == 0:
+            return []
+        
+        min_heap = []
+        result = []
+        
+        # 1. Initialization: Push pairs (nums1[i], nums2[0]) for all i.
+        # We only need to go up to min(len(nums1), k) because we only need k pairs total.
+        # This acts as our "starting column".
+        for i in range(min(len(nums1), k)):
+            heapq.heappush(min_heap, (nums1[i] + nums2[0], i, 0))
+            
+        # 2. Extract and Expand
+        while min_heap and len(result) < k:
+            current_sum, i, j = heapq.heappop(min_heap)
+            result.append([nums1[i], nums2[j]])
+            
+            # 3. Only move "Right" (increment index in nums2).
+            # We don't need to move "Down" (increment i) because those 
+            # were already added during the initialization step!
+            next_j = j + 1
+            if next_j < len(nums2):
+                heapq.heappush(min_heap, (nums1[i] + nums2[next_j], i, next_j))
+                
+        return result
+
+# Extension:  
+
 # 1) Maximum Sum Combinations
 
 # 2) Merge k sorted arrays
 # This is also an wider extension of this approach only.
+
+# Java Code 
+"""
+import java.util.*;
+
+public class Solution {
+    public List<List<Integer>> kSmallestPairs(int[] nums1, int[] nums2, int k) {
+        Set<String> visited = new HashSet<>();
+        visited.add("0,0");
+        List<List<Integer>> ans = new ArrayList<>();
+        PriorityQueue<int[]> heap = new PriorityQueue<>(Comparator.comparingInt(a -> a[0]));
+
+        heap.add(new int[]{nums1[0] + nums2[0], 0, 0});   // (sum, i, j)  // i, j index of nums1 and nums2.
+
+        while (ans.size() < k && !heap.isEmpty()) {
+            int[] top = heap.poll();
+            int i = top[1], j = top[2];
+            ans.add(Arrays.asList(nums1[i], nums2[j]));
+
+            if (j + 1 < nums2.length && !visited.contains(i + "," + (j + 1))) {
+                visited.add(i + "," + (j + 1));
+                heap.add(new int[]{nums1[i] + nums2[j + 1], i, j + 1});
+            }
+            if (i + 1 < nums1.length && !visited.contains((i + 1) + "," + j)) {
+                visited.add((i + 1) + "," + j);
+                heap.add(new int[]{nums1[i + 1] + nums2[j], i + 1, j});
+            }
+        }
+
+        return ans;
+    }
+}
+"""
+
+# C++ Code
+"""
+#include <vector>
+#include <queue>
+#include <set>
+#include <utility>
+
+class Solution {
+public:
+    std::vector<std::vector<int>> kSmallestPairs(std::vector<int>& nums1, std::vector<int>& nums2, int k) {
+        using T = std::tuple<int, int, int>;  // (sum, i, j)
+        std::priority_queue<T, std::vector<T>, std::greater<T>> heap;
+        std::set<std::pair<int, int>> visited;
+        std::vector<std::vector<int>> ans;
+
+        visited.insert({0, 0});
+        heap.push({nums1[0] + nums2[0], 0, 0});   // (sum, i, j)  // i, j index of nums1 and nums2.
+
+        while (ans.size() < k && !heap.empty()) {
+            auto [sum, i, j] = heap.top(); heap.pop();
+            ans.push_back({nums1[i], nums2[j]});
+
+            if (j + 1 < nums2.size() && visited.insert({i, j + 1}).second) {
+                heap.push({nums1[i] + nums2[j + 1], i, j + 1});
+            }
+            if (i + 1 < nums1.size() && visited.insert({i + 1, j}).second) {
+                heap.push({nums1[i + 1] + nums2[j], i + 1, j});
+            }
+        }
+
+        return ans;
+    }
+};
+"""

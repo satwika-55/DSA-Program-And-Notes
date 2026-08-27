@@ -1,3 +1,5 @@
+# method 1: 
+
 # logic: Brute force just checked the left and right height for every node
 # time: 0(n^2)
 # space: O(n): if skew tree recursion depth will go O(n)
@@ -19,6 +21,76 @@ class Solution:
         r= self.maxDepth(root.right)
         return 1+ max(l,r)
 
+# Java Code 
+"""
+class TreeNode {
+    int val;
+    TreeNode left, right;
+    TreeNode(int x) { val = x; }
+}
+
+class Solution {
+    public boolean isBalanced(TreeNode root) {
+        if (root == null) {
+            return true;
+        }
+        int l = maxDepth(root.left);
+        int r = maxDepth(root.right);
+        if (Math.abs(l - r) > 1) {
+            return false;
+        }
+        // if root is balanced then check for its child
+        return isBalanced(root.left) && isBalanced(root.right);
+    }
+
+    public int maxDepth(TreeNode root) {
+        if (root == null) {
+            return 0;
+        }
+        int l = maxDepth(root.left);
+        int r = maxDepth(root.right);
+        return 1 + Math.max(l, r);
+    }
+}
+"""
+# C++ Code 
+"""
+#include <cmath>
+using namespace std;
+
+struct TreeNode {
+    int val;
+    TreeNode* left;
+    TreeNode* right;
+    TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+};
+
+class Solution {
+public:
+    bool isBalanced(TreeNode* root) {
+        if (root == nullptr) {
+            return true;
+        }
+        int l = maxDepth(root->left);
+        int r = maxDepth(root->right);
+        if (abs(l - r) > 1) {
+            return false;
+        }
+        // if root is balanced then check for its child
+        return isBalanced(root->left) && isBalanced(root->right);
+    }
+
+    int maxDepth(TreeNode* root) {
+        if (root == nullptr) {
+            return 0;
+        }
+        int l = maxDepth(root->left);
+        int r = maxDepth(root->right);
+        return 1 + max(l, r);
+    }
+};
+"""
+# Method 2: 
 # more concise way of writing above code
 class Solution:
     def isBalanced(self, root: Optional[TreeNode]) -> bool:
@@ -33,7 +105,63 @@ class Solution:
             return 0
         return 1 + max(self.maxDepth(root.left),self.maxDepth(root.right))
 
-# method 2: O(n)
+# Java Code 
+"""
+class TreeNode {
+    int val;
+    TreeNode left, right;
+    TreeNode(int x) { val = x; }
+}
+
+class Solution {
+    public boolean isBalanced(TreeNode root) {
+        if (root == null) {
+            return true;
+        }
+        int l = maxDepth(root.left);
+        int r = maxDepth(root.right);
+        return Math.abs(l - r) <= 1 && isBalanced(root.left) && isBalanced(root.right);  // if all three follows then only it is balanced
+    }
+
+    private int maxDepth(TreeNode root) {
+        if (root == null) {
+            return 0;
+        }
+        return 1 + Math.max(maxDepth(root.left), maxDepth(root.right));
+    }
+}
+"""
+
+# C++ Code 
+"""
+#include <cmath>
+using namespace std;
+
+struct TreeNode {
+    int val;
+    TreeNode* left;
+    TreeNode* right;
+    TreeNode(int x): val(x), left(nullptr), right(nullptr) {}
+};
+
+class Solution {
+public:
+    bool isBalanced(TreeNode* root) {
+        if (!root) return true;
+        int l = maxDepth(root->left);
+        int r = maxDepth(root->right);
+        return abs(l - r) <= 1 && isBalanced(root->left) && isBalanced(root->right);  // if all three follows then only it is balanced
+    }
+
+    int maxDepth(TreeNode* root) {
+        if (!root) return 0;
+        return 1 + max(maxDepth(root->left), maxDepth(root->right));
+    }
+};
+"""
+
+# method 3
+# time: O(n)
 """
 There is lot of repitition in above method.
 
@@ -66,6 +194,7 @@ Note: we can't return True/False based on True/false because in Python True->1 a
 
 '-1' means tree is unbalanced 
 """
+
 class Solution:
     def isBalanced(self, root: Optional[TreeNode]) -> bool:
         # just apply the logic odf maxDepth
@@ -80,33 +209,69 @@ class Solution:
             return 1+ max(left,right)
             
         return check(root)!= -1  # if not equal to '-1' means balanced
+    
 
-# Java
+# Java Code 
 """
+class TreeNode {
+    int val;
+    TreeNode left, right;
+    TreeNode(int x) { val = x; }
+}
+
 class Solution {
     public boolean isBalanced(TreeNode root) {
-        return check(root) != -1;
+        // just apply the logic of maxDepth
+        return check(root) != -1;  // if not equal to '-1' means balanced
     }
-    
+
     private int check(TreeNode root) {
         if (root == null) {
             return 0;
         }
-        
         int left = check(root.left);
         int right = check(root.right);
-        
-        if (left == -1 || right == -1 || Math.abs(left - right) > 1) {
+        if (left == -1 || right == -1 || Math.abs(left - right) > 1) // if any one of them is unbalance
             return -1;
-        }
-        
+        // if balanced then return the max height 
         return 1 + Math.max(left, right);
     }
 }
 """
 
-# Method 3:
-# Simplest way of writing above logic using 'ans' as global variable.
+# C++ Code 
+"""
+#include <cmath>
+using namespace std;
+
+struct TreeNode {
+    int val;
+    TreeNode* left;
+    TreeNode* right;
+    TreeNode(int x): val(x), left(nullptr), right(nullptr) {}
+};
+
+class Solution {
+public:
+    bool isBalanced(TreeNode* root) {
+        // just apply the logic of maxDepth
+        return check(root) != -1;  // if not equal to '-1' means balanced
+    }
+
+    int check(TreeNode* root) {
+        if (!root) return 0;
+        int left = check(root->left);
+        int right = check(root->right);
+        if (left == -1 || right == -1 || abs(left - right) > 1)  // if any one of them is unbalance
+            return -1;
+        // if balanced then return the max height 
+        return 1 + max(left, right);
+    }
+};
+"""
+
+# Method 4:
+# Simplest way of writing Method 3 logic using 'ans' as global variable.
 # Do by this only
 
 class Solution:
@@ -125,16 +290,22 @@ class Solution:
         maxDepth(root)
         return self.ans
 
-# Java
+# Java Code 
 """
+class TreeNode {
+    int val;
+    TreeNode left, right;
+    TreeNode(int x) { val = x; }
+}
+
 class Solution {
-    private boolean ans = true;
-    
+    boolean ans = true;  
+
     public boolean isBalanced(TreeNode root) {
-        maxDepth(root);
+        maxDepth(root);  // check if subtree starting from root is balanced.
         return ans;
     }
-    
+
     private int maxDepth(TreeNode root) {
         if (root == null) {
             return 0;
@@ -147,4 +318,37 @@ class Solution {
         return 1 + Math.max(l, r);
     }
 }
+"""
+
+# C++ Code 
+"""
+#include <cmath>
+using namespace std;
+
+struct TreeNode {
+    int val;
+    TreeNode* left;
+    TreeNode* right;
+    TreeNode(int x): val(x), left(nullptr), right(nullptr) {}
+};
+
+class Solution {
+public:
+    bool ans = true;  
+
+    bool isBalanced(TreeNode* root) {
+        maxDepth(root);  // check if subtree starting from root is balanced.
+        return ans;
+    }
+
+    int maxDepth(TreeNode* root) {
+        if (!root) return 0;
+        int l = maxDepth(root->left);
+        int r = maxDepth(root->right);
+        if (abs(l - r) > 1) {
+            ans = false;
+        }
+        return 1 + max(l, r);
+    }
+};
 """

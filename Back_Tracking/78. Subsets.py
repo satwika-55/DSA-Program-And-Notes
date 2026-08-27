@@ -19,6 +19,64 @@ class Solution:
         dfs(0, [])  
         return res
 
+# Java Code 
+"""
+import java.util.*;
+
+public class Solution {
+
+    // just backtracking
+    public void dfs(int i, int[] nums, List<Integer> subset, List<List<Integer>> res) {
+        if (i == nums.length) {
+            res.add(new ArrayList<>(subset));
+            return;
+        }
+        // when you include the curr index ele.
+        subset.add(nums[i]);
+        dfs(i + 1, nums, subset, res);
+        subset.remove(subset.size() - 1); // backtrack
+
+        // when you don't include the curr index ele.
+        dfs(i + 1, nums, subset, res);
+    }
+
+    public List<List<Integer>> subsets(int[] nums) {
+        List<List<Integer>> res = new ArrayList<>();
+        dfs(0, nums, new ArrayList<>(), res);
+        return res;
+    }
+}
+"""
+# C++ Code 
+"""
+#include <iostream>
+#include <vector>
+using namespace std;
+
+// just backtracking
+void dfs(int i, const vector<int>& nums, vector<int>& subset, vector<vector<int>>& res) {
+    if (i == nums.size()) {
+        res.push_back(subset);
+        return;
+    }
+
+    // when you include the curr index ele.
+    subset.push_back(nums[i]);
+    dfs(i + 1, nums, subset, res);
+    subset.pop_back(); // backtrack
+
+    // when you don't include the curr index ele.
+    dfs(i + 1, nums, subset, res);
+}
+
+vector<vector<int>> subsets(const vector<int>& nums) {
+    vector<vector<int>> res;
+    vector<int> subset;
+    dfs(0, nums, subset, res);
+    return res;
+}
+"""
+
 # Method 2 : Using Bit Masking
 
 # n : len(nums)
@@ -46,6 +104,56 @@ class Solution:
             ans.append(temp)
         return ans
 
+# Java Code 
+"""
+import java.util.*;
+
+public class Solution {
+
+    public List<List<Integer>> subsets(int[] nums) {
+        int n = nums.length;
+        List<List<Integer>> ans = new ArrayList<>();
+
+        for (int num = 0; num < (1 << n); num++) {
+            List<Integer> temp = new ArrayList<>();
+            // add the number whose 'index' bit is set in num
+            for (int i = 0; i < n; i++) {
+                // if 'i'th bit is set in 'num then nums[i] is part of this subset.
+                if ((num >> i & 1) == 1) {
+                    temp.add(nums[i]);
+                }
+            }
+            ans.add(temp);
+        }
+        return ans;
+    }
+}
+"""
+# C++ Code 
+"""
+#include <iostream>
+#include <vector>
+using namespace std;
+
+vector<vector<int>> subsets(const vector<int>& nums) {
+    int n = nums.size();
+    vector<vector<int>> ans;
+
+    for (int num = 0; num < (1 << n); ++num) {
+        vector<int> temp;
+        // add the number whose 'index' bit is set in num
+        for (int i = 0; i < n; ++i) {
+            // if 'i'th bit is set in 'num then nums[i] is part of this subset.
+            if ((num >> i) & 1) {
+                temp.push_back(nums[i]);
+            }
+        }
+        ans.push_back(temp);
+    }
+
+    return ans;
+}
+"""
 # method 3:
 # iterative way:
 
@@ -85,90 +193,54 @@ class Solution:
                 outer.append(internal)    # and at alst append the internal created list to the outer list
         return outer
 
-
-# concise way of writing above code:
-# class Solution:
-#     def subsets(self, nums: List[int]) -> List[List[int]]:
-#         outer= [[]]   # our final ans will contain list of list
-#         for num in nums:
-#             outer+= [items+ [num] for items in outer]
-#         return outer
-
-
-# Related Q: 
-# 1) 90. Subsets II
+# concise way of writing method 3 in python
+class Solution:
+    def subsets(self, nums: List[int]) -> List[List[int]]:
+        outer= [[]]   # our final ans will contain list of list
+        for num in nums:
+            outer+= [items+ [num] for items in outer]
+        return outer
 
 
-# Java
+# Java Code 
 """
-// method 1:
+import java.util.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class Solution {
-    public List<List<Integer>> subsets(int[] nums) {
-        List<List<Integer>> res = new ArrayList<>();
-        dfs(nums, 0, new ArrayList<>(), res);
-        return res;
-    }
-
-    private void dfs(int[] nums, int index, List<Integer> subset, List<List<Integer>> res) {
-        if (index == nums.length) {
-            res.add(new ArrayList<>(subset));  // Make a copy of the current subset
-            return;
-        }
-        
-        // Include the current index element
-        subset.add(nums[index]);
-        dfs(nums, index + 1, subset, res);
-        
-        // Exclude the current index element
-        subset.remove(subset.size() - 1);
-        dfs(nums, index + 1, subset, res);
-    }
-}
-
-// method 2:
-public class Solution {
-    public List<List<Integer>> subsets(int[] nums) {
-        int n = nums.length;
-        List<List<Integer>> ans = new ArrayList<>();
-        
-        for (int num = 0; num < (1 << n); num++) {
-            List<Integer> temp = new ArrayList<>();
-            for (int i = 0; i < n; i++) {
-                if ((num >> i & 1) == 1) {
-                    temp.add(nums[i]);
-                }
-            }
-            ans.add(temp);
-        }
-        
-        return ans;
-    }
-}
-
-// method 3:
 public class Solution {
     public List<List<Integer>> subsets(int[] nums) {
         List<List<Integer>> outer = new ArrayList<>();
-        outer.add(new ArrayList<>());  // Start with an empty subset
+        outer.add(new ArrayList<>());   // our final ans will contain list of list
 
-        for (int num : nums) {
+        for (int num : nums) {   // for each number in the array
             int n = outer.size();
             for (int i = 0; i < n; i++) {
-                // Make a copy of the current subset
-                List<Integer> internal = new ArrayList<>(outer.get(i));
-                // Add the current number to the copied subset
-                internal.add(num);
-                // Add the new subset to the list of subsets
-                outer.add(internal);
+                List<Integer> internal = new ArrayList<>(outer.get(i));  // copy the internal list of outer list one by one
+                internal.add(num);       // and append the number to all the existing list
+                outer.add(internal);     // and at last append the internal created list to the outer list
             }
         }
-        
         return outer;
     }
 }
+"""
+# C++ Code 
+"""
+#include <iostream>
+#include <vector>
+using namespace std;
 
+vector<vector<int>> subsets(const vector<int>& nums) {
+    vector<vector<int>> outer;
+    outer.push_back({});   // our final ans will contain list of list
+
+    for (int num : nums) {   // for each number in the array
+        int n = outer.size();
+        for (int i = 0; i < n; ++i) {
+            vector<int> internal = outer[i];  // copy the internal list of outer list one by one
+            internal.push_back(num);          // and append the number to all the existing list
+            outer.push_back(internal);        // and at last append the internal created list to the outer list
+        }
+    }
+    return outer;
+}
 """

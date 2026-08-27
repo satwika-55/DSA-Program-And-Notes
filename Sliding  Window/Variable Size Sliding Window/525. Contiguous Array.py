@@ -2,11 +2,20 @@
 
 
 # method 2: 
-# logic: whenever you see '0' decr the count, when you see '1' incr the count.
-# when at any index you see the same value of count before means 
-# you have found one of the subarray from last seen same count value to current index.
+"""
+Prefix Sum + Hash Map
 
-# time= space= O(n)
+Logic: whenever you see '0' decr the count, when you see '1' incr the count.
+when at any index you see the same value of count before means 
+you have found one of the subarray from last seen same count value to current index.
+
+1. By treating 0 as -1 and 1 as +1, a subarray with an equal number of zeros and ones will have a sum of exactly 0.
+2. If the prefix sum at index i is C, and the prefix sum at index j is also C, it means the sum of elements between i+1 and j must be 0.
+3. We store the first time we see a specific count. We do not update it if we see it again, 
+because we want the longest subarray, so we keep the earliest possible starting index.
+
+time= space= O(n)
+"""
 
 class Solution:
     def findMaxLength(self, nums: List[int]) -> int:
@@ -24,6 +33,70 @@ class Solution:
                 hashmap[count]= i
         return maxLen
 
-# Note: we can apply exactly same logic(even same code) in Q asking : 
+# Note: we can apply exactly same logic(even same code) in Q where you have to keep track of exactly two types of elements:
 # 1) "longest substring/subarray having equal no of count of both when each ele can be of two type only".
 # 2) "Find the max length of substring having equal no of lowercase and uppercase letter".
+# 3. "Find the max length of substring having equal no of vowels & consonants".
+
+# Java Code 
+"""
+import java.util.*;
+
+class Solution {
+    public int findMaxLength(int[] nums) {
+        int count = 0;  // if num == 0, decrease count by '1', and if num == 1, increase count by '1'.
+        int maxLen = 0;  // to handle the case when all nums are either '0' or '1' only.
+        Map<Integer, Integer> hashmap = new HashMap<>();
+        hashmap.put(0, -1);  // [count: index], initializing to handle the case when at any index count == 0, meaning the subarray from start to that index is valid.
+
+        for (int i = 0; i < nums.length; i++) {
+            if (nums[i] == 0) {
+                count--;
+            } else {  // nums[i] == 1
+                count++;
+            }
+
+            if (hashmap.containsKey(count)) {  
+                // Since we got a duplicate count, the sum between these two indices must be zero, meaning a valid subarray.
+                maxLen = Math.max(maxLen, i - hashmap.get(count));
+            } else {
+                hashmap.put(count, i);  // Store the first occurrence of this count.
+            }
+        }
+        return maxLen;
+    }
+}
+"""
+# C++ Code 
+"""
+#include <iostream>
+#include <vector>
+#include <unordered_map>
+
+using namespace std;
+
+class Solution {
+public:
+    int findMaxLength(vector<int>& nums) {
+        int count = 0;  // if num == 0, decrease count by '1', and if num == 1, increase count by '1'.
+        int maxLen = 0;  // to handle the case when all nums are either '0' or '1' only.
+        unordered_map<int, int> hashmap = {{0, -1}};  // [count: index], initializing to handle the case when at any index count == 0, meaning the subarray from start to that index is valid.
+
+        for (int i = 0; i < nums.size(); i++) {
+            if (nums[i] == 0) {
+                count--;
+            } else {  // nums[i] == 1
+                count++;
+            }
+
+            if (hashmap.find(count) != hashmap.end()) {  
+                // Since we got a duplicate count, the sum between these two indices must be zero, meaning a valid subarray.
+                maxLen = max(maxLen, i - hashmap[count]);
+            } else {
+                hashmap[count] = i;  // Store the first occurrence of this count.
+            }
+        }
+        return maxLen;
+    }
+};
+"""

@@ -1,4 +1,5 @@
-# method 1: simplest solution
+# method 1: 
+# simplest solution
 # How to think of stack?
 # agar koi closing bracket dikha tb , pichla wala same type ka open bracket hona chahiye.
 # first opened will be closed at last.
@@ -26,8 +27,85 @@ class Solution:
                         return False
         return stack == [0]    # means no extra char remaining in stack 
 
+# Java Code 
+"""
+import java.util.*;
 
-# method 2: concise one
+public class Solution {
+    public boolean isValid(String s) {
+        Stack<Character> stack = new Stack<>();
+        stack.push('0');  // initializing stack with '0' to check at last
+        // stack == [] won't handle the case when s = ']' etc.
+
+        int n = s.length();
+        for (int i = 0; i < n; i++) {
+            // push if any opening bracket comes
+            if (s.charAt(i) == '(' || s.charAt(i) == '{' || s.charAt(i) == '[') {
+                stack.push(s.charAt(i));
+            } else {
+                // pop if any closing bracket come of same type
+                // if closing bracket is not of same type then 'invalid'
+                if (s.charAt(i) == ')') {
+                    if (stack.pop() != '(') return false;
+                }
+                if (s.charAt(i) == '}') {
+                    if (stack.pop() != '{') return false;
+                }
+                if (s.charAt(i) == ']') {
+                    if (stack.pop() != '[') return false;
+                }
+            }
+        }
+        return stack.size() == 1 && stack.peek() == '0';  // means no extra char remaining in stack
+    }
+}
+
+"""
+
+# C++ Code 
+"""
+#include <iostream>
+#include <stack>
+#include <string>
+using namespace std;
+
+class Solution {
+public:
+    bool isValid(string s) {
+        stack<char> stack;
+        stack.push('0');  // initializing stack with '0' to check at last
+        // stack == [] won't handle the case when s = ']' etc.
+
+        int n = s.length();
+        for (int i = 0; i < n; i++) {
+            // push if any opening bracket comes
+            if (s[i] == '(' || s[i] == '{' || s[i] == '[') {
+                stack.push(s[i]);
+            } else {
+                // pop if any closing bracket come of same type
+                // if closing bracket is not of same type then 'invalid'
+                if (s[i] == ')') {
+                    if (stack.top() != '(') return false;
+                    stack.pop();
+                }
+                if (s[i] == '}') {
+                    if (stack.top() != '{') return false;
+                    stack.pop();
+                }
+                if (s[i] == ']') {
+                    if (stack.top() != '[') return false;
+                    stack.pop();
+                }
+            }
+        }
+        return stack.size() == 1 && stack.top() == '0';  // means no extra char remaining in stack
+    }
+};
+
+"""
+
+# method 2: 
+# concise one
 # logic: push closing braces of the current braces after seeing the opening braces
 # and when you encouter the closed parenthesis check the ele on top of stack
 # if same as current char then continue the loop
@@ -49,71 +127,72 @@ class Solution:
         return stack== [0]   # after traversing all the string if stack is empty
                             # then valid otherwise not
 
-# java
+# Java Code 
 """
-# Method 1:
-import java.util.Stack;
+import java.util.*;
 
 public class Solution {
-    public boolean isValid(String s) {
+    public boolean valid(String s) {
         Stack<Character> stack = new Stack<>();
-        stack.push('0'); // Initializing stack with '0' to check at last
+        stack.push('0');  // initialising to check whether stack is empty or not 
 
         for (int i = 0; i < s.length(); i++) {
-            char current = s.charAt(i);
-            // Push if any opening bracket comes
-            if (current == '(' || current == '{' || current == '[') {
-                stack.push(current);
-            } 
-            // Pop if any closing bracket comes of the same type
-            // If closing bracket is not of the same type then 'invalid'
-            else {
-                if (current == ')') {
-                    if (stack.pop() != '(') {
-                        return false;
-                    }
-                } else if (current == '}') {
-                    if (stack.pop() != '{') {
-                        return false;
-                    }
-                } else if (current == ']') {
-                    if (stack.pop() != '[') {
-                        return false;
-                    }
-                }
-            }
-        }
-
-        // Means no extra char remaining in stack
-        return stack.size() == 1 && stack.peek() == '0';
-    }
-}
-
-# Method 2:
-class Solution {
-    public boolean isValid(String s) {
-        Stack<Character> stack = new Stack<>();
-        stack.push('0'); // Initializing to check whether stack is empty or not
-
-        for (int i = 0; i < s.length(); i++) {
-            char current = s.charAt(i);
-            if (current == '(') {
+            if (s.charAt(i) == '(') {
                 stack.push(')');
-            } else if (current == '{') {
+            } else if (s.charAt(i) == '{') {
                 stack.push('}');
-            } else if (current == '[') {
+            } else if (s.charAt(i) == '[') {
                 stack.push(']');
-            } else if (stack.pop() != current) {
-                // If stack is empty or current char is not equal to ele on top of the stack
+            } else if (stack.pop() != s.charAt(i)) {
+                // if stack is empty or current char
+                // is not equal to ele on top of the stack
                 // then it means not valid
                 return false;
             }
         }
 
-        // After traversing all the string if stack is empty then valid otherwise not
+        // after traversing all the string if stack is empty
+        // then valid otherwise not
         return stack.size() == 1 && stack.peek() == '0';
     }
-    }
+}
 
-    
+"""
+
+# C++ Code 
+"""
+#include <iostream>
+#include <stack>
+#include <string>
+using namespace std;
+
+class Solution {
+public:
+    bool valid(string s) {
+        stack<char> stack;
+        stack.push('0');  // initialising to check whether stack is empty or not 
+
+        for (int i = 0; i < s.size(); i++) {
+            if (s[i] == '(') {
+                stack.push(')');
+            } else if (s[i] == '{') {
+                stack.push('}');
+            } else if (s[i] == '[') {
+                stack.push(']');
+            } else if (stack.top() != s[i]) {
+                // if stack is empty or current char
+                // is not equal to ele on top of the stack
+                // then it means not valid
+                return false;
+            } else {
+                stack.pop();
+            }
+        }
+
+        // after traversing all the string if stack is empty
+        // then valid otherwise not
+        return stack.size() == 1 && stack.top() == '0';
+    }
+};
+
 """

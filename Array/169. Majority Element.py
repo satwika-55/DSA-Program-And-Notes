@@ -1,7 +1,7 @@
 # Note vvi: There can be exactly one majority ele.
 
 # method 1:
-# using dictionary(this i submitted on GFG)
+# time = space = O(n)
 class Solution:
     def majorityElement(self, A, N):
         middle_index= N//2
@@ -23,7 +23,8 @@ class Solution:
 # in this case middle index must be the index of majority element
 # in this case, time: O(1), just return the middle ele 
 
-# but here we are sorting then returning the mid ele so, time: 0(nlogn)
+# but here we are sorting then returning the mid ele so,
+#  time: 0(nlogn), space  = O(1)
 class Solution:
     def majorityElement(self, nums: List[int]) -> int:
         nums.sort()
@@ -64,40 +65,11 @@ class Solution:
         return m
 
 
-# Mthod 4: Another way of writing the same logic
-# More logical and better
-
-# Logic: Since majority element already exist, every ele has two choice:
-# 1) it can be same as cur majority element
-# 2) different from cur majority
-
-# Har ele ke passs 2 choice : 
-# i) majority ele h. 
-# is case me count ko bs increment karna h.
-# ii) majority ele nhi h.
-# is case me count ko decrease karna h and agar count == 0 ho gya decrease karne ke bad
-# Then, majority ele ko update kar dena h current ele se and count = 1 kar dena h.
-
-class Solution:
-    def majorityElement(self, nums: List[int]) -> int:
-        m = nums[0]  # Assume majority is nums[0]
-        count = 1   # nums[0]
-        for i in range(1, len(nums)):
-            if nums[i] == m:
-                count += 1
-            else:
-                count -= 1
-                if count == 0:
-                    m = nums[i]
-                    count = 1
-        return m
-
-
-# Another way of writing the above code
-# Best one
+# Method 4: Better one to write the 'Moore’s Voting Algorithm' in other way
 # on this approach, we can solve the Q :"229. Majority Element II".
 
 # Just relate to real life counting of votes in ele i.e how a condidate wins.
+# Time: O(n) , space : O(1)
 
 class Solution:
     def majorityElement(self, nums: List[int]) -> int:
@@ -117,31 +89,176 @@ class Solution:
                 count -= 1
         return m
 
-# Java
+# Java Code 
 """
+//Method 1
+import java.util.*;
+
 class Solution {
+    // Method 1: Using HashMap
     public int majorityElement(int[] nums) {
-        Integer m = 1000000001;  // This will hold the majority element
-        int count = 0;     // This will hold the count of the current candidate
-        
-        for (int n : nums) {
-            if (n == m) {
-                // Vote of the majority element will increase
-                count++;
-            } 
-            // If the current candidate is not m and count is 0, then the current element becomes the majority
-            else if (count == 0) {
-                m = n;   // Current element will become the majority element (current winning candidate)
-                count = 1; // Reset count for the new candidate
-            } 
-            // If the current candidate is not m and count > 0, then the count for m will decrease
-            else { 
-                // Current element can't be the winning candidate, it will just reduce the vote of the current winning candidate
-                count--;
+        int middle_index = nums.length / 2;
+        Map<Integer, Integer> hashmap = new HashMap<>();
+
+        for (int num : nums) {
+            hashmap.put(num, hashmap.getOrDefault(num, 0) + 1);
+        }
+
+        for (Map.Entry<Integer, Integer> entry : hashmap.entrySet()) {
+            if (entry.getValue() > middle_index) {
+                return entry.getKey();
             }
         }
-        
-        return m; // Return the majority element
+
+        return -1;
     }
 }
+
+//Method 2
+import java.util.*;
+
+class Solution {
+    // Method 2: Sorting and taking the middle index
+    public int majorityElement(int[] nums) {
+        Arrays.sort(nums);
+        return nums[nums.length / 2];
+    }
+}
+
+//Method 3
+class Solution {
+    // Method 3: Moore’s Voting Algorithm
+    public int majorityElement(int[] nums) {
+        int cnt = 0, m = 0;
+        for (int num : nums) {
+            if (cnt == 0) {
+                m = num;
+                cnt++;
+            } else {
+                cnt += (num == m) ? 1 : -1;
+            }
+        }
+        return m;
+    }
+}
+
+// Method 4
+class Solution {
+    public int majorityElement(int[] nums) {
+        Integer m = null;
+        int count = 0;
+
+        for (int n : nums) {
+            if (n == m) {
+                // vote of majority ele will increase.
+                count += 1;
+            }
+            // Agar majority 'm' nhi h and count = 0 h then cur ele majority ban jayega.
+            else if (count == 0) {
+                // cur ele will become majority ele (current winning condidate)
+                m = n;
+                count = 1;
+            }
+            // Agar majority 'm' nhi h and count > 0 h then 'm' ka count kamega.
+            else {
+                // cur ele can't be the winning condidate, it will just reduce the vote of cur winning condidate i.e cur majority ele
+                count -= 1;
+            }
+        }
+        return m;
+    }
+}
+
+"""
+
+# C++ Code 
+"""
+//Method 1
+#include <vector>
+#include <unordered_map>
+#include <algorithm>
+
+using namespace std;
+
+class Solution {
+public:
+    // Method 1: Using HashMap
+    int majorityElement(vector<int>& nums) {
+        int middle_index = nums.size() / 2;
+        unordered_map<int, int> hashmap;
+
+        for (int num : nums) {
+            hashmap[num]++;
+        }
+
+        for (const auto& entry : hashmap) {
+            if (entry.second > middle_index) {
+                return entry.first;
+            }
+        }
+
+        return -1;
+    }
+};
+
+//Method 2
+class Solution {
+public:
+    // Method 2: Sorting and taking the middle index
+    int majorityElement(vector<int>& nums) {
+        sort(nums.begin(), nums.end());
+        return nums[nums.size() / 2];
+    }
+};
+
+//Method 3
+class Solution {
+public:
+    // Method 3: Moore’s Voting Algorithm
+    int majorityElement(vector<int>& nums) {
+        int cnt = 0, m = 0;
+        for (int num : nums) {
+            if (cnt == 0) {
+                m = num;
+                cnt++;
+            } else {
+                cnt += (num == m) ? 1 : -1;
+            }
+        }
+        return m;
+    }
+};
+
+// method 4:
+#include <vector>
+using namespace std;
+
+class Solution {
+public:
+    int majorityElement(vector<int>& nums) {
+        int m = 0;
+        int count = 0;
+
+        for (int n : nums) {
+            if (n == m) {
+                // vote of majority ele will increase.
+                count += 1;
+            }
+            // Agar majority 'm' nhi h and count = 0 h then cur ele majority ban jayega.
+            else if (count == 0) {
+                // cur ele will become majority ele (current winning condidate)
+                m = n;
+                count = 1;
+            }
+            // Agar majority 'm' nhi h and count > 0 h then 'm' ka count kamega.
+            else {
+                // cur ele can't be the winning condidate, it will just reduce the vote of cur winning condidate i.e cur majority ele
+                count -= 1;
+            }
+        }
+        return m;
+    }
+};
+
+
 """

@@ -1,3 +1,5 @@
+# Method 1:
+
 # Logic: We need to only care about brackets.
 # So we can just check combination of '(' and ')' ignoring alphabetical character.
 # When we will see '(' we will push index of '(' into stack  and 
@@ -31,44 +33,90 @@ class Solution:
         # Now return the ans as string
         return  "".join(list_s)
 
-# Java
+# Java Code 
 """
 class Solution {
     public String minRemoveToMakeValid(String s) {
-        // Convert the input string to a char array (mutable).
         char[] list_s = s.toCharArray();
-        // Stack to keep track of indices of '(' characters.
         Stack<Integer> stack = new Stack<>();
-        
-        // First pass: Remove invalid ')' characters.
+
         for (int i = 0; i < list_s.length; i++) {
             if (list_s[i] == '(') {
-                stack.push(i); // Push index of '(' onto the stack.
+                stack.push(i);
             } else if (list_s[i] == ')') {
-                // If there's a matching '(' for this ')', pop the stack.
+                // pop if stack is not empty. Means we have required pair for this one.
                 if (!stack.isEmpty()) {
                     stack.pop();
-                } else {
-                    // If no matching '(', mark this ')' for removal by setting it to '\0'.
+                } 
+                // For cur char ')' there is no pair. so we have make value at this index = "".
+                // Means extra char, so we will remove this.
+                else {
                     list_s[i] = '\0';
                 }
             }
         }
-        
-        // Second pass: Remove any unmatched '(' characters remaining in the stack.
+
+        // Now if our stack is not empty then we will have to make all those index value = "".
+        // Because these '(' have no matching pair.
         while (!stack.isEmpty()) {
-            list_s[stack.pop()] = '\0'; // Mark unmatched '(' for removal.
+            list_s[stack.pop()] = '\0';
         }
-        
-        // Build the final valid string by ignoring marked characters ('\0').
+
+        // Now return the ans as string
         StringBuilder result = new StringBuilder();
         for (char c : list_s) {
             if (c != '\0') {
                 result.append(c);
             }
         }
-        
-        return result.toString(); // Return the valid string.
+
+        return result.toString();
     }
 }
+"""
+
+# C++ Code 
+"""
+#include <string>
+#include <stack>
+
+class Solution {
+public:
+    std::string minRemoveToMakeValid(std::string s) {
+        std::stack<int> stack;
+
+        for (int i = 0; i < s.length(); ++i) {
+            if (s[i] == '(') {
+                stack.push(i);
+            } else if (s[i] == ')') {
+                // pop if stack is not empty. Means we have required pair for this one.
+                if (!stack.empty()) {
+                    stack.pop();
+                }
+                // For cur char ')' there is no pair. so we have make value at this index = "".
+                // Means extra char, so we will remove this.
+                else {
+                    s[i] = '\0';
+                }
+            }
+        }
+
+        // Now if our stack is not empty then we will have to make all those index value = "".
+        // Because these '(' have no matching pair.
+        while (!stack.empty()) {
+            s[stack.top()] = '\0';
+            stack.pop();
+        }
+
+        // Now return the ans as string
+        std::string result;
+        for (char c : s) {
+            if (c != '\0') {
+                result += c;
+            }
+        }
+
+        return result;
+    }
+};
 """

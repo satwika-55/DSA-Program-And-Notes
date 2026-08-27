@@ -1,3 +1,5 @@
+# Method 1: 
+
 # Simplifying rules
 """
 i) Each digit in the pattern must be adjacent to the previous digit, either vertically, horizontally, or diagonally.
@@ -68,52 +70,29 @@ class Solution:
         dfs({5}, 5)
         return self.ans
 
-# Java
+# Java Code 
 """
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-class Solution {
-    private final Map<Integer, Integer> skip = new HashMap<>();
+public class Solution {
     private int ans = 0;
+    private final Map<String, Integer> skip = new HashMap<>();
 
     public int numberOfPatterns(int m, int n) {
-        // Initialize skip map
-        skip.put(10 * 1 + 7, 4);
-        skip.put(10 * 1 + 3, 2);
-        skip.put(10 * 1 + 9, 5);
-        skip.put(10 * 2 + 8, 5);
-        skip.put(10 * 3 + 7, 5);
-        skip.put(10 * 3 + 9, 6);
-        skip.put(10 * 4 + 6, 5);
-        skip.put(10 * 7 + 9, 8);
+        // Mapping the required intermediate digit between pairs
+        skip.put("1,3", 2);
+        skip.put("1,7", 4);
+        skip.put("1,9", 5);
+        skip.put("2,8", 5);
+        skip.put("3,7", 5);
+        skip.put("3,9", 6);
+        skip.put("4,6", 5);
+        skip.put("7,9", 8);
 
-        // Reset the answer counter
-        ans = 0;
-
-        // Check patterns starting with each digit
-        Set<Integer> visited = new HashSet<>();
-        
-        // Patterns starting with digit 1
-        visited.add(1);
-        dfs(visited, 1, m, n);
-        visited.clear();
-
-        // Patterns starting with digit 2
-        visited.add(2);
-        dfs(visited, 2, m, n);
-        visited.clear();
-        
-        // Multiply by 4 to account for symmetry (starting from 1, 3, 7, 9)
+        dfs(new HashSet<>(List.of(1)), 1, m, n);
+        dfs(new HashSet<>(List.of(2)), 2, m, n);
         ans *= 4;
-
-        // Patterns starting with digit 5
-        visited.add(5);
-        dfs(visited, 5, m, n);
-        visited.clear();
-        
+        dfs(new HashSet<>(List.of(5)), 5, m, n);
         return ans;
     }
 
@@ -121,22 +100,69 @@ class Solution {
         if (visited.size() >= m) {
             ans++;
         }
-        if (visited.size() == n) {
-            return;
-        }
+        if (visited.size() == n) return;
+
         for (int i = 1; i <= 9; i++) {
             if (!visited.contains(i)) {
-                int pairMin = Math.min(last, i);
-                int pairMax = Math.max(last, i);
-                int pairKey = 10 * pairMin + pairMax;
-                if (!skip.containsKey(pairKey) || visited.contains(skip.get(pairKey))) {
-                    visited.add(i);
-                    dfs(visited, i, m, n);
-                    visited.remove(i);
+                String pair = Math.min(i, last) + "," + Math.max(i, last);
+                if (!skip.containsKey(pair) || visited.contains(skip.get(pair))) {
+                    Set<Integer> newSet = new HashSet<>(visited);
+                    newSet.add(i);
+                    dfs(newSet, i, m, n);
                 }
             }
         }
     }
 }
+"""
+# C++ Code 
+"""
+#include <iostream>
+#include <unordered_map>
+#include <unordered_set>
+#include <string>
+using namespace std;
 
+class Solution {
+    int ans = 0;
+    unordered_map<string, int> skip;
+
+public:
+    int numberOfPatterns(int m, int n) {
+        // Mapping the required intermediate digit between pairs
+        skip["1,3"] = 2;
+        skip["1,7"] = 4;
+        skip["1,9"] = 5;
+        skip["2,8"] = 5;
+        skip["3,7"] = 5;
+        skip["3,9"] = 6;
+        skip["4,6"] = 5;
+        skip["7,9"] = 8;
+
+        dfs({1}, 1, m, n);
+        dfs({2}, 2, m, n);
+        ans *= 4;
+        dfs({5}, 5, m, n);
+        return ans;
+    }
+
+private:
+    void dfs(unordered_set<int> visited, int last, int m, int n) {
+        if (visited.size() >= m) {
+            ans++;
+        }
+        if (visited.size() == n) return;
+
+        for (int i = 1; i <= 9; ++i) {
+            if (!visited.count(i)) {
+                string key = to_string(min(i, last)) + "," + to_string(max(i, last));
+                if (!skip.count(key) || visited.count(skip[key])) {
+                    unordered_set<int> newVisited = visited;
+                    newVisited.insert(i);
+                    dfs(newVisited, i, m, n);
+                }
+            }
+        }
+    }
+};
 """

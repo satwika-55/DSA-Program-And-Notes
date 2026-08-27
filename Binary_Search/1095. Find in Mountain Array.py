@@ -1,5 +1,11 @@
-# find the index of peak ele
-# and apply binary search on left and right of the peak index.
+"""
+Find the index of peak ele
+and apply binary search on left and right of the peak index.
+
+Since there is only one peak element so this logic will be totally valid. 
+(Ascending from start to peak, descending from 'peak + 1' to end)
+TIme : o(logn)
+"""
 
 class Solution:
         def findInMountainArray(self, target: int, mountain_arr: 'MountainArray') -> int:
@@ -59,4 +65,55 @@ class Solution:
 # Reason: Here we can't say if one part is unsorted then other part will be sorted.
 # if sorted then we can apply binary search but here we can't say.
 
+# method 2:
+# Better and concise one
 
+class Solution:
+    def findInMountainArray(self, target: int, mountainArr: 'MountainArray') -> int:
+        n = mountainArr.length()
+        
+        # 1. Find the peak index
+        l, r = 0, n - 1
+        while l < r:
+            mid = l + (r - l) // 2
+            if mountainArr.get(mid) > mountainArr.get(mid + 1):
+                r = mid
+            else:
+                l = mid + 1
+        peak = l
+        
+        # 2. Search in the ascending part (left of peak)
+        # Result found here is guaranteed to be the minimum index.
+        res = self.orderAgnosticBS(mountainArr, target, 0, peak, True)
+        if res != -1: return res
+        
+        # 3. Search in the descending part (right of peak)
+        return self.orderAgnosticBS(mountainArr, target, peak + 1, n - 1, False)
+
+    def orderAgnosticBS(self, arr, target, low, high, isAscending):
+        """Standard BS with a toggle for ascending or descending logic."""
+        while low <= high:
+            mid = low + (high - low) // 2
+            val = arr.get(mid) # Store value to minimize API calls
+            
+            if val == target:
+                return mid
+            
+            # Flip logic based on direction
+            if isAscending:
+                if val < target: low = mid + 1
+                else: high = mid - 1
+            else:
+                if val > target: low = mid + 1
+                else: high = mid - 1
+        return -1
+
+# follow ups"
+"""
+Q) What if we have multiple peak element?
+
+-> 
+1. If the goal is just to find any local peak (where arr[i-1] < arr[i] > arr[i+1]), your O(log n) logic still works perfectly! 
+This is actually LeetCode 162 (Find Peak Element).
+2.But if the goal is to find a target, you have to fall back to:Linear Search: $O(n)$Modified Binary Search: Only works if you have additional information (like the array is rotated).
+"""

@@ -1,3 +1,5 @@
+# Method 1: 
+
 # brute force
 # time: O(n^2)
 def SubArray_Sum(arr,k):
@@ -20,7 +22,7 @@ k = 33
 # k= 2
 # print(SubArray_Sum(arr,k))     
 
-
+# Method 2: 
 # sliding window but valid only if all number is +ve(> 0).
 # time : O(n)
 def Count_SubArray(arr,k):
@@ -43,11 +45,15 @@ arr= [1,1,1,1,2,1]
 k= 3
 print(Count_SubArray(arr,k))
 
+# Method 3: 
+"""
+Better one: just similar to "Two sum" method & Question : Longest Subarray with Sum K
+VVI: analyse this Q and "Longest Subarray with Sum K" similarity and differences properly
 
-# better one: just similar to "Two sum" method.
-# time: O(n)
-# VVI: analyse this Q and previous Q similarity and differences properly
-# Draw it on number line then you get the proper visualisation.
+Here you just have to keep track of {sum: count} instead of {sum : index} that's it.
+time = space = O(n)
+"""
+
 class Solution:
     def subarraySum(self, nums: List[int], k: int) -> int:
         ans,curr_sum= 0,0
@@ -63,13 +69,3 @@ class Solution:
             prefix_sum[curr_sum]= 1+ prefix_sum.get(curr_sum, 0) 
         return ans
 
-
-# Note: Extension of this Q and related Q
-"""
-1) 930. Binary Subarrays With Sum
-2) 1248. Count Number of Nice Subarrays
-3) Count Subarrays with Given XOR
-4) 525. Contiguous Array
-5) 974. Subarray Sums Divisible by K
-6) vvi:  "1074. Number of Submatrices That Sum to Target"
-"""
