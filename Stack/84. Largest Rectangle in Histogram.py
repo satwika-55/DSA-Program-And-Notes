@@ -312,6 +312,8 @@ class Solution:
             # Maintain a monotonic strictly increasing stack of indices.
             # A drop in height means 'i' acts as the Right Boundary (Next Smaller Element) 
             # for the bar currently at the top of the stack.
+
+            # just checking for which all current index 'i' is right side corner
             while stack and extended_heights[stack[-1]] > h:
                 # Target bar to calculate area for. Its maximum height is fixed.
                 target_idx = stack.pop()
